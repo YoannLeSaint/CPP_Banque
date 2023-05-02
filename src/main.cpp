@@ -236,7 +236,7 @@ int choiceByHolder(vector<Compte>* accountsList, vector<Personne>* clientsList)
             if (accountsList->at(i).getHolder().getFirstname() == clientsList->at(personChoice).getFirstname()
             && accountsList->at(i).getHolder().getLastname() == clientsList->at(personChoice).getLastname())
             {
-                cout << i << ") " << typeid(accountsList->at(i)).name() << " : " << accountsList->at(i).ConsultBalance();
+                cout << i << ") " << typeid(accountsList->at(i)).name() << " : " << accountsList->at(i).ConsultBalance() << endl;
             }
         }
         cin >> accountChoice;
@@ -295,6 +295,7 @@ void interaction(Compte& account)
         cout << "5) Consult debits." << endl;
         cout << "6) Consult credits." << endl;
         cout << "> ";
+        cin >> userChoice;
 
         switch (userChoice)
         {
@@ -408,7 +409,7 @@ int main() {
         switch (answer){
         case 0:
             cout << "Good bye!" << endl;
-            exit(0);
+            return 0;
         case 1:
             add(&clientsList, &advisorsList, &accountsList);
             break;
