@@ -1,4 +1,4 @@
-## Author:
+## Authors:
 
 *Yoann Le Saint* - 
 *Axel Laforge* - 
