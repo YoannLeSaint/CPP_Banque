@@ -13,12 +13,13 @@ Personne::Personne(){
     cin >> firstname;
     cout << endl;
 
-    cout << "Enter lastname:\t";
+    cout << "Enter lastname:\t\t";
     cin >> lastname;
     cout << endl;
 
-    cout << "Enter adress:\t";
-    cin >> adress;
+    cout << "Enter adress:\t\t";
+    cin.ignore();
+    getline(cin, adress);
     cout << endl;
 
     Personne(firstname, lastname, adress);
@@ -41,7 +42,6 @@ void Personne::setAdress(string adress){
 
 string Personne::toString(){
     stringstream ss;
-	ss << "-> " << getFirstname() << " " << getLastname() << " :" << endl;
-    ss << "_t" << getAdress() << endl;
+	ss << "-> " << getFirstname() << " " << getLastname() << ": " << getAdress() << endl;
 	return ss.str();
 }
