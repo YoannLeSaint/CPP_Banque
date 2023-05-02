@@ -14,7 +14,7 @@ private:
     string p_adress;
 
 public:
-    Personne() = default;
+    Personne();
     Personne(string firstname, string lastname, string adress);
 
     ~Personne() = default;

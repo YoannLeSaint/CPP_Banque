@@ -6,14 +6,7 @@ Compte::Compte(Personne* holder, Personne* advisor, float amount) {
     this->p_holder = *holder;
     this->p_advisor = *advisor;
     this->p_balance = amount;
-
-    cout << "Salut" << endl;
 }
-
-Compte::Compte() {
-    cout << "yo" << endl;
-}
-
 
 // Destructeur
 Compte::~Compte()

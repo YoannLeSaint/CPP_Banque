@@ -28,7 +28,7 @@ string Operation::toString(){
     if (getSum() > 0){
         ss << getName() << " (" << getDate() << ") : +" << getSum() << "EUR" << endl;
     } else {
-        ss << getName() << " (" << getDate() << ") : " << getSum() << "EUR" << endl;
+        ss << getName() << " (" << getDate() << ") : -" << getSum() << "EUR" << endl;
     }
 
     return ss.str();

@@ -16,8 +16,6 @@ private:
 
 protected:
     // Getters
-    Personne getHolder();
-    Personne getAdvisor();
     vector<Operation> getHistoric();
     float getBalance();
 
@@ -29,11 +27,15 @@ protected:
 
 public:
     // Constructeurs
-    Compte();
+    Compte() = default;
     Compte(Personne* holder, Personne* advisor, float amount);
 
     // Destructeur
     ~Compte();
+
+    // Getters
+    Personne getHolder();
+    Personne getAdvisor();
 
     // Méthodes
     void deposit(float amount);

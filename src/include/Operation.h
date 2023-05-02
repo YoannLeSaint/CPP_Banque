@@ -8,7 +8,6 @@
 using namespace std;
 
 class Operation{
-    
 private:
     string p_date;
     string p_name;
