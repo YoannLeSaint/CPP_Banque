@@ -1,5 +1,6 @@
 #pragma once
-
+#include <sstream>
+#include <string>
 #include "Compte.h"
 #include "Personne.h"
 
@@ -12,8 +13,9 @@ private:
 public:
     CompteEnLigne() = default;
     CompteEnLigne(Personne* holder, Personne* advisor, float amount);
-    ~CompteEnLigne();
+    ~CompteEnLigne() = default;
 
 
     void inlineConsult();
+    string toString();
 };

@@ -8,7 +8,7 @@ Operation::Operation(string date, string name, float sum){
 
 string Operation::getDate(){ return this-> p_date; }
 string Operation::getName(){ return this-> p_name; }
-float Operation::getSum(){ return this-> p_sum;     }
+float Operation::getSum(){ return this-> p_sum;    }
 
 void Operation::setDate(string date){
     this-> p_date = date;
@@ -28,7 +28,7 @@ string Operation::toString(){
     if (getSum() > 0){
         ss << getName() << " (" << getDate() << ") : +" << getSum() << "EUR" << endl;
     } else {
-        ss << getName() << " (" << getDate() << ") : -" << getSum() << "EUR" << endl;
+        ss << getName() << " (" << getDate() << ") : " << getSum() << "EUR" << endl;
     }
 
     return ss.str();

@@ -11,6 +11,10 @@ Compte::Compte(Personne* holder, Personne* advisor, float amount) {
 // Destructeur
 Compte::~Compte()
 {
+    for (int i = this->p_historic.size()-1; i >= 0; i--)
+    {
+        delete &this->p_historic[i];
+    }
 }
 
 void Compte::deposit(float amount) {
@@ -51,6 +55,26 @@ vector<Operation> Compte::consultCredit() {
     }
 
     return res;
+}
+
+void Compte::addMovement(float sum)
+{
+    stringstream name, date;
+    time_t now = time(0);
+
+    name << "operation" << this->p_historic.size()+1;
+    date << localtime(&now)->tm_mday << "/" << localtime(&now)->tm_mon+1 << "/" << localtime(&now)->tm_year+1900;
+    date << " " << localtime(&now)->tm_hour << ":" << localtime(&now)->tm_min << ":" << localtime(&now)->tm_sec;
+    Operation* ope = new Operation(date.str(), name.str(), sum);
+
+    this->p_historic.push_back(*ope);
+}
+
+string Compte::toString()
+{
+    stringstream ss;
+    ss << getHolder().toString() << " - " << getBalance() << "EUR" << endl;
+    return ss.str();
 }
 
 // Getters

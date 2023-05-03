@@ -2,12 +2,12 @@
 
 
 Personne::Personne(string firstname, string lastname, string adress){
-    this-> p_firstname = firstname;
-    this-> p_lastname = lastname;
-    this-> p_adress = adress;
+    this->p_firstname = firstname;
+    this->p_lastname = lastname;
+    this->p_adress = adress;
 }
 
-Personne::Personne(){
+Personne::Personne(int nothing){
     string firstname, lastname, adress;
     cout << "Enter firstname:\t";
     cin >> firstname;
@@ -22,7 +22,7 @@ Personne::Personne(){
     getline(cin, adress);
     cout << endl;
 
-    Personne(firstname, lastname, adress);
+    *this = Personne(firstname, lastname, adress);
 }
 
 string Personne::getFirstname(){ return this-> p_firstname; }
@@ -42,6 +42,6 @@ void Personne::setAdress(string adress){
 
 string Personne::toString(){
     stringstream ss;
-	ss << "-> " << getFirstname() << " " << getLastname() << ": " << getAdress() << endl;
+	ss << "-> " << getFirstname() << " " << getLastname() << " : " << getAdress();
 	return ss.str();
 }

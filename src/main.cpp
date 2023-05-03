@@ -17,11 +17,11 @@ using namespace std;
 
 int displayVector(vector<Personne> *vect, string nameVect){
     int index = 0;
-    cout << nameVect << endl;
+
     if (vect->size() == 0){
         cout << "No " << nameVect << " data." << endl << endl;
     } else {
-        for (int i = 0; i < vect->size(); i++){
+        for (long long unsigned int i = 0; i < vect->size(); i++){
             cout << "+ " << i+1 << "\t" << vect->at(i).toString() << endl;
         }
         cout << "> ";
@@ -39,17 +39,18 @@ void add(vector<Personne> *clientsList,
     while (true){
         cout << "Which add do you want ?" << endl;
         cout <<  "\ta)Client\n\tb)Adviser\n\tc)Account\n\td)Back to main Menu" << endl;
+        cout << "> ";
         cin >> anwserADD;
         switch (anwserADD){
         case 'a':
             {
-            Personne *pClient = new Personne();
+            Personne *pClient = new Personne(0);
             clientsList->push_back(*pClient);
             return;
             }
         case 'b':
             {
-            Personne* pAdviser = new Personne();
+            Personne* pAdviser = new Personne(0);
             advisorsList->push_back(*pAdviser);
             return;
             }
@@ -72,10 +73,10 @@ void add(vector<Personne> *clientsList,
                         cout << "Select your advisor" << endl;
                         indexAdvisor = displayVector(advisorsList, "advisor");
                         cout << "Select your client" << endl;
-                        indexClient = displayVector(clientsList, "advisor");
+                        indexClient = displayVector(clientsList, "client");
                         if (indexAdvisor != -1 && indexAdvisor != -1)
                         {
-                            cout << "Client amount :";
+                            cout << "Client amount : ";
                             cin >> amount;
                             cout << endl;
                             CompteEnLigne *inlineAcc = new CompteEnLigne(&clientsList->at(indexClient), &advisorsList->at(indexAdvisor), amount);
@@ -92,7 +93,7 @@ void add(vector<Personne> *clientsList,
                         indexClient = displayVector(clientsList, "advisor");
                         if (indexAdvisor != -1 && indexAdvisor != -1)
                         {
-                            cout << "Client amount :";
+                            cout << "Client amount : ";
                             cin >> amount;
                             cout << endl;
                             CompteStandard *standardAcc = new CompteStandard(&clientsList->at(indexClient), &advisorsList->at(indexAdvisor), amount);
@@ -109,10 +110,10 @@ void add(vector<Personne> *clientsList,
                         indexClient = displayVector(clientsList, "advisor");
                         if (indexAdvisor != -1 && indexAdvisor != -1)
                         {
-                            cout << "Client amount :";
+                            cout << "Client amount : ";
                             cin >> amount;
                             cout << endl;
-                            cout << "Interest :";
+                            cout << "Interest : ";
                             cin >> interest;
                             cout << endl;
                             CompteEpargne *savingAcc = new CompteEpargne(&clientsList->at(indexClient), &advisorsList->at(indexAdvisor), amount, interest);
@@ -137,23 +138,13 @@ void add(vector<Personne> *clientsList,
     }
 }
 
-string printPersonne(Personne list){
-    return list.toString();
-}
-
-string printCompte(Compte list){
-    stringstream ss;
-	ss << list.getHolder().toString() << " (" << typeid(list).name() << ") - " << list.ConsultBalance() << "EUR" << endl;
-	return ss.str();
-}
-
 void del(vector<Personne>* clientsList, vector<Personne>* advisorsList, vector<Compte>* accountsList){
     char answerDel;
     int x(0);
     while(true){
         cout << "What do you want to delete ?" << endl;
-        cout << "\ta)Client\n\tb)Adviser\n\tc)Account\n\td)Back to main menu" << endl;
-        cout << ">";
+        cout << "\ta)Client\n\tb)Advisor\n\tc)Account\n\td)Back to main menu" << endl;
+        cout << "> ";
         cin >> answerDel;
 
         switch(answerDel){
@@ -164,11 +155,19 @@ void del(vector<Personne>* clientsList, vector<Personne>* advisorsList, vector<C
                 } else {
                     for (long unsigned int i = 0; i < clientsList->size(); i++)
                     {
-                        cout << i << ") " << printPersonne(clientsList->at(i));
+                        cout << i << ") " << clientsList->at(i).toString() << endl;
                     }
                     cout << "Please select the number of the client you want to delete : " << endl;
-                    cout << ">";
+                    cout << "> ";
                     cin >> x;
+
+                    for (long int i = accountsList->size() - 1; i >= 0; i--)
+                    {
+                        if (accountsList->at(i).getHolder().toString() == clientsList->at(x).toString())
+                        {
+                            accountsList->erase(accountsList->begin()+i);
+                        }
+                    }
                     clientsList->erase(clientsList->begin()+x);
                     return;
                 }
@@ -179,11 +178,30 @@ void del(vector<Personne>* clientsList, vector<Personne>* advisorsList, vector<C
                 } else {
                     for (long unsigned int i = 0; i < advisorsList->size(); i++)
                     {
-                        cout << i << ") " << printPersonne(advisorsList->at(i));
+                        cout << i << ") " << advisorsList->at(i).toString() << endl;
                     }
+
                     cout << "Please select the number of the advisor you want to delete : " << endl;
-                    cout << ">";
+                    cout << "> ";
                     cin >> x;
+
+                    for (long unsigned int i = 0; i < accountsList->size(); i++)
+                    {
+                        int adv = 0;
+                        if (accountsList->at(i).getAdvisor().toString() == advisorsList->at(x).toString()){
+                            cout << "Please select a new advisor for the following account : " << endl;
+                            cout << "- " << accountsList->at(i).toString() << endl;
+
+                            for (long unsigned int j = 0; j < advisorsList->size(); j++)
+                            {
+                                if (advisorsList->at(j).toString() != advisorsList->at(x).toString())
+                                    cout << j << ") " << advisorsList->at(j).toString();
+                            }
+                            cout << "> ";
+                            cin >> adv;
+                            accountsList->at(i).setAdvisor(&advisorsList->at(adv));
+                        }
+                    }
                     advisorsList->erase(advisorsList->begin()+x);
                     return;
                 }
@@ -194,10 +212,10 @@ void del(vector<Personne>* clientsList, vector<Personne>* advisorsList, vector<C
                 } else {
                     for (long unsigned int i = 0; i < accountsList->size(); i++)
                     {
-                        cout << i << ") " << printCompte(accountsList->at(i));
+                        cout << i << ") " << accountsList->at(i).toString();
                     }
                     cout << "Please select the number of the account you want to delete : " << endl;
-                    cout << ">";
+                    cout << "> ";
                     cin >> x;
                     accountsList->erase(accountsList->begin()+x);
                     return;
@@ -214,8 +232,8 @@ void del(vector<Personne>* clientsList, vector<Personne>* advisorsList, vector<C
 
 int choiceByHolder(vector<Compte>* accountsList, vector<Personne>* clientsList)
 {
-    int personChoice = -1;
-    int accountChoice = -1;
+    long long unsigned int personChoice = -1;
+    long long unsigned int accountChoice = -1;
 
     while (personChoice < 0 || personChoice >= clientsList->size())
     {
@@ -224,6 +242,7 @@ int choiceByHolder(vector<Compte>* accountsList, vector<Personne>* clientsList)
         {
             cout << i << ") " << clientsList->at(i).getFirstname() + " " + clientsList->at(i).getLastname() << endl;
         }
+        cout << "> ";
         cin >> personChoice;
     }
 
@@ -236,9 +255,10 @@ int choiceByHolder(vector<Compte>* accountsList, vector<Personne>* clientsList)
             if (accountsList->at(i).getHolder().getFirstname() == clientsList->at(personChoice).getFirstname()
             && accountsList->at(i).getHolder().getLastname() == clientsList->at(personChoice).getLastname())
             {
-                cout << i << ") " << typeid(accountsList->at(i)).name() << " : " << accountsList->at(i).ConsultBalance() << endl;
+                cout << i << ") " << accountsList->at(i).toString() << endl;
             }
         }
+        cout << "> ";
         cin >> accountChoice;
     }
 
@@ -247,8 +267,8 @@ int choiceByHolder(vector<Compte>* accountsList, vector<Personne>* clientsList)
 
 int choiceByAdvisor(vector<Compte>* accountsList, vector<Personne>* advisorsList)
 {
-    int personChoice = -1;
-    int accountChoice = -1;
+    long long unsigned int personChoice = -1;
+    long long unsigned int accountChoice = -1;
 
     while (personChoice < 0 || personChoice >= advisorsList->size())
     {
@@ -257,6 +277,7 @@ int choiceByAdvisor(vector<Compte>* accountsList, vector<Personne>* advisorsList
         {
             cout << i << ") " << advisorsList->at(i).getFirstname() + " " + advisorsList->at(i).getLastname() << endl;
         }
+        cout << "> ";
         cin >> personChoice;
     }
 
@@ -269,9 +290,10 @@ int choiceByAdvisor(vector<Compte>* accountsList, vector<Personne>* advisorsList
             if (accountsList->at(i).getAdvisor().getFirstname() == advisorsList->at(personChoice).getFirstname()
             && accountsList->at(i).getAdvisor().getLastname() == advisorsList->at(personChoice).getLastname())
             {
-                cout << i << ") " << typeid(accountsList->at(i)).name() << " : " << accountsList->at(i).ConsultBalance();
+                cout << i << ") " << accountsList->at(i).toString() << endl;
             }
         }
+        cout << "> ";
         cin >> accountChoice;
     }
 
@@ -306,6 +328,7 @@ void interaction(Compte& account)
             cout << "How much do you want to deposit?" << endl;
             cout << "> ";
             cin >> amount;
+            account.addMovement(amount);
             account.deposit(amount);
             break;
 
@@ -313,6 +336,7 @@ void interaction(Compte& account)
             cout << "How much do you want to withdraw?" << endl;
             cout << "> ";
             cin >> amount;
+            account.addMovement(amount*-1);
             account.withdraw(amount);
             break;
 
@@ -325,7 +349,7 @@ void interaction(Compte& account)
 
             for (Operation ope : listOpe)
             {
-                cout << "* " << ope.toString() << endl;
+                cout << "\t* " << ope.toString() << endl;
             }
             break;
 
@@ -334,7 +358,7 @@ void interaction(Compte& account)
 
             for (Operation ope : listOpe)
             {
-                cout << "* " << ope.toString() << endl;
+                cout << "\t* " << ope.toString() << endl;
             }
             break;
 
@@ -343,7 +367,7 @@ void interaction(Compte& account)
 
             for (Operation ope : listOpe)
             {
-                cout << "* " << ope.toString() << endl;
+                cout << "\t* " << ope.toString() << endl;
             }
             break;
 
@@ -364,7 +388,7 @@ void interact(vector<Compte>* accountsList, vector<Personne>* clientsList, vecto
         cout << "0) None. I want to quit." << endl;
         cout << "1) By Holder." << endl;
         cout << "2) By Advisor." << endl;
-        cout << ">";
+        cout << "> ";
         cin >> choice;
 
         switch (choice)
@@ -397,7 +421,42 @@ int main() {
     vector<Compte> accountsList;
     int answer(0);
 
+    Personne *p1 = new Personne("Jean", "Todt", "ici");
+    Personne *p2 = new Personne("Jean", "Todd", "la bas");
+    Personne *p3 = new Personne("Marc", "Todt", "chez lui");
+    Personne *p4 = new Personne("Yoann", "Le Saint", "Nantes DC");
+    Personne *p5 = new Personne("Charlotte", "Todt", "NY");
+
+    clientsList.push_back(*p1);
+    clientsList.push_back(*p2);
+    clientsList.push_back(*p3);
+    clientsList.push_back(*p5);
+
+    advisorsList.push_back(*p4);
+    advisorsList.push_back(*p5);
+
+    CompteEnLigne* account1 = new CompteEnLigne(p1, p5, 500);
+    //Compte *acc1 = &account1;
+    accountsList.push_back(*account1);
+
+    CompteEpargne *account2 = new CompteEpargne(p1, p5, 3540, 3);
+    accountsList.push_back(*account2);
+
+    CompteStandard *account3 = new CompteStandard(p2, p4, 500);
+    accountsList.push_back(*account3);
+
+    CompteStandard *account4 = new CompteStandard(p3, p4, 10);
+    accountsList.push_back(*account4);
+
+    CompteStandard *account5 = new CompteStandard(p5, p4, 10000);
+    accountsList.push_back(*account5);
+
     while(true) {
+        for(long unsigned int i=0; i<accountsList.size(); i++)
+        {
+            cout << accountsList.at(i).toString() << " - " << accountsList.at(i).getAdvisor().toString() << endl;
+        }
+
         cout << "What do you want to do?" << endl;
         cout << "0) Quit." << endl;
         cout << "1) Add." << endl;

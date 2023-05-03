@@ -1,4 +1,5 @@
 #pragma once
+#include <sstream>
 #include "Compte.h"
 #include "Personne.h"
 
@@ -14,4 +15,6 @@ public:
     CompteStandard() = default;
     CompteStandard(Personne* holder, Personne* advisor, float amount);
     ~CompteStandard() = default;
+
+    string toString();
 };

@@ -4,6 +4,8 @@ CompteEpargne::CompteEpargne(Personne* holder, Personne* advisor, float amount, 
     this->p_interest = interest;
 }
 
-CompteEpargne::~CompteEpargne()
-{
+string CompteEpargne::toString(){
+    stringstream ss;
+	ss << getHolder().toString() << " (Compte Epargne) - " << getBalance() << "EUR" << endl;
+	return ss.str();
 }
