@@ -281,7 +281,7 @@ int choiceByAdvisor(vector<Compte*>* accountsList, vector<Personne*>* advisorsLi
 
     while (personChoice < 0 || personChoice >= advisorsList->size())
     {
-        cout << "What is the name of the holder?" << endl;
+        cout << "What is the name of the advisor?" << endl;
         for (long unsigned int i = 0; i < advisorsList->size(); i++)
         {
             cout << i << ") " << advisorsList->at(i)->getFirstname() + " " + advisorsList->at(i)->getLastname() << endl;
@@ -292,7 +292,7 @@ int choiceByAdvisor(vector<Compte*>* accountsList, vector<Personne*>* advisorsLi
 
     while (accountChoice < 0 || accountChoice >= accountsList->size())
     {
-        cout << "Accounts of the holder :" << endl;
+        cout << "Accounts managed by the advisor :" << endl;
 
         for (long unsigned int i = 0; i < accountsList->size(); i++)
         {
