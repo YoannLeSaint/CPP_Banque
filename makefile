@@ -29,7 +29,7 @@ WDELOBJ = $(SRC:$(SRCDIR)/%$(EXT)=$(OBJDIR)\\%.o)
 ####################### Targets beginning here #########################
 ########################################################################
 
-all: $(cleandep) $(APPNAME) $(cleandep)
+all: $(APPNAME)
 
 # Builds the app
 $(APPNAME): $(OBJ)

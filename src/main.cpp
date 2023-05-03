@@ -15,14 +15,14 @@
 using namespace std;
 
 
-int displayVector(vector<Personne> *vect, string nameVect){
+int displayVector(vector<Personne*> *vect, string nameVect){
     int index = 0;
 
     if (vect->size() == 0){
         cout << "No " << nameVect << " data." << endl << endl;
     } else {
         for (long long unsigned int i = 0; i < vect->size(); i++){
-            cout << "+ " << i+1 << "\t" << vect->at(i).toString() << endl;
+            cout << "# " << i+1 << "\t" << vect->at(i)->toString() << endl;
         }
         cout << "> ";
         cin >> index;
@@ -30,10 +30,19 @@ int displayVector(vector<Personne> *vect, string nameVect){
     return index - 1;
 }
 
+void displayAccount(vector<Compte*> *acc){
+    if (acc->size() == 0){
+        cout << "No account." << endl << endl;
+    } else {
+        for (long long unsigned int i = 0; i < acc->size(); i++){
+            cout << "+ " << i+1 << " " << acc->at(i)->toString() << endl;
+        }
+    }
+}
 
-void add(vector<Personne> *clientsList,
-         vector<Personne> *advisorsList,
-         vector<Compte>   *accountsList)
+void add(vector<Personne*> *clientsList,
+         vector<Personne*> *advisorsList,
+         vector<Compte*>  *accountsList)
 {
     char anwserADD;
     while (true){
@@ -45,13 +54,13 @@ void add(vector<Personne> *clientsList,
         case 'a':
             {
             Personne *pClient = new Personne(0);
-            clientsList->push_back(*pClient);
+            clientsList->push_back(pClient);
             return;
             }
         case 'b':
             {
             Personne* pAdviser = new Personne(0);
-            advisorsList->push_back(*pAdviser);
+            advisorsList->push_back(pAdviser);
             return;
             }
         case 'c':
@@ -79,8 +88,8 @@ void add(vector<Personne> *clientsList,
                             cout << "Client amount : ";
                             cin >> amount;
                             cout << endl;
-                            CompteEnLigne *inlineAcc = new CompteEnLigne(&clientsList->at(indexClient), &advisorsList->at(indexAdvisor), amount);
-                            accountsList->push_back(*inlineAcc);
+                            CompteEnLigne *inlineAcc = new CompteEnLigne(clientsList->at(indexClient), advisorsList->at(indexAdvisor), amount);
+                            accountsList->push_back(inlineAcc);
                         }
                         return;
                     }
@@ -96,8 +105,8 @@ void add(vector<Personne> *clientsList,
                             cout << "Client amount : ";
                             cin >> amount;
                             cout << endl;
-                            CompteStandard *standardAcc = new CompteStandard(&clientsList->at(indexClient), &advisorsList->at(indexAdvisor), amount);
-                            accountsList->push_back(*standardAcc);
+                            CompteStandard *standardAcc = new CompteStandard(clientsList->at(indexClient), advisorsList->at(indexAdvisor), amount);
+                            accountsList->push_back(standardAcc);
                         }
                         return;
                     }
@@ -116,8 +125,8 @@ void add(vector<Personne> *clientsList,
                             cout << "Interest : ";
                             cin >> interest;
                             cout << endl;
-                            CompteEpargne *savingAcc = new CompteEpargne(&clientsList->at(indexClient), &advisorsList->at(indexAdvisor), amount, interest);
-                            accountsList->push_back(*savingAcc);
+                            CompteEpargne *savingAcc = new CompteEpargne(clientsList->at(indexClient), advisorsList->at(indexAdvisor), amount, interest);
+                            accountsList->push_back(savingAcc);
                         }
                         return;
                     }
@@ -138,7 +147,7 @@ void add(vector<Personne> *clientsList,
     }
 }
 
-void del(vector<Personne>* clientsList, vector<Personne>* advisorsList, vector<Compte>* accountsList){
+void del(vector<Personne*>* clientsList, vector<Personne*>* advisorsList, vector<Compte*>* accountsList){
     char answerDel;
     int x(0);
     while(true){
@@ -155,7 +164,7 @@ void del(vector<Personne>* clientsList, vector<Personne>* advisorsList, vector<C
                 } else {
                     for (long unsigned int i = 0; i < clientsList->size(); i++)
                     {
-                        cout << i << ") " << clientsList->at(i).toString() << endl;
+                        cout << i << ") " << clientsList->at(i)->toString() << endl;
                     }
                     cout << "Please select the number of the client you want to delete : " << endl;
                     cout << "> ";
@@ -163,7 +172,7 @@ void del(vector<Personne>* clientsList, vector<Personne>* advisorsList, vector<C
 
                     for (long int i = accountsList->size() - 1; i >= 0; i--)
                     {
-                        if (accountsList->at(i).getHolder().toString() == clientsList->at(x).toString())
+                        if (accountsList->at(i)->getHolder().toString() == clientsList->at(x)->toString())
                         {
                             accountsList->erase(accountsList->begin()+i);
                         }
@@ -178,7 +187,7 @@ void del(vector<Personne>* clientsList, vector<Personne>* advisorsList, vector<C
                 } else {
                     for (long unsigned int i = 0; i < advisorsList->size(); i++)
                     {
-                        cout << i << ") " << advisorsList->at(i).toString() << endl;
+                        cout << i << ") " << advisorsList->at(i)->toString() << endl;
                     }
 
                     cout << "Please select the number of the advisor you want to delete : " << endl;
@@ -188,18 +197,18 @@ void del(vector<Personne>* clientsList, vector<Personne>* advisorsList, vector<C
                     for (long unsigned int i = 0; i < accountsList->size(); i++)
                     {
                         int adv = 0;
-                        if (accountsList->at(i).getAdvisor().toString() == advisorsList->at(x).toString()){
+                        if (accountsList->at(i)->getAdvisor().toString() == advisorsList->at(x)->toString()){
                             cout << "Please select a new advisor for the following account : " << endl;
-                            cout << "- " << accountsList->at(i).toString() << endl;
+                            cout << accountsList->at(i)->toString() << endl;
 
                             for (long unsigned int j = 0; j < advisorsList->size(); j++)
                             {
-                                if (advisorsList->at(j).toString() != advisorsList->at(x).toString())
-                                    cout << j << ") " << advisorsList->at(j).toString();
+                                if (advisorsList->at(j)->toString() != advisorsList->at(x)->toString())
+                                    cout << j << ") " << advisorsList->at(j)->toString();
                             }
-                            cout << "> ";
+                            cout << endl << "> ";
                             cin >> adv;
-                            accountsList->at(i).setAdvisor(&advisorsList->at(adv));
+                            accountsList->at(i)->setAdvisor(advisorsList->at(adv));
                         }
                     }
                     advisorsList->erase(advisorsList->begin()+x);
@@ -212,7 +221,7 @@ void del(vector<Personne>* clientsList, vector<Personne>* advisorsList, vector<C
                 } else {
                     for (long unsigned int i = 0; i < accountsList->size(); i++)
                     {
-                        cout << i << ") " << accountsList->at(i).toString();
+                        cout << i << ") " << accountsList->at(i)->toString();
                     }
                     cout << "Please select the number of the account you want to delete : " << endl;
                     cout << "> ";
@@ -230,7 +239,7 @@ void del(vector<Personne>* clientsList, vector<Personne>* advisorsList, vector<C
     }
 }
 
-int choiceByHolder(vector<Compte>* accountsList, vector<Personne>* clientsList)
+int choiceByHolder(vector<Compte*>* accountsList, vector<Personne*>* clientsList)
 {
     long long unsigned int personChoice = -1;
     long long unsigned int accountChoice = -1;
@@ -240,7 +249,7 @@ int choiceByHolder(vector<Compte>* accountsList, vector<Personne>* clientsList)
         cout << "What is the name of the holder?" << endl;
         for (long unsigned int i = 0; i < clientsList->size(); i++)
         {
-            cout << i << ") " << clientsList->at(i).getFirstname() + " " + clientsList->at(i).getLastname() << endl;
+            cout << i << ") " << clientsList->at(i)->getFirstname() + " " + clientsList->at(i)->getLastname() << endl;
         }
         cout << "> ";
         cin >> personChoice;
@@ -252,10 +261,10 @@ int choiceByHolder(vector<Compte>* accountsList, vector<Personne>* clientsList)
 
         for (long unsigned int i = 0; i < accountsList->size(); i++)
         {
-            if (accountsList->at(i).getHolder().getFirstname() == clientsList->at(personChoice).getFirstname()
-            && accountsList->at(i).getHolder().getLastname() == clientsList->at(personChoice).getLastname())
+            if (accountsList->at(i)->getHolder().getFirstname() == clientsList->at(personChoice)->getFirstname()
+            && accountsList->at(i)->getHolder().getLastname() == clientsList->at(personChoice)->getLastname())
             {
-                cout << i << ") " << accountsList->at(i).toString() << endl;
+                cout << i << ") " << accountsList->at(i)->toString() << endl;
             }
         }
         cout << "> ";
@@ -265,7 +274,7 @@ int choiceByHolder(vector<Compte>* accountsList, vector<Personne>* clientsList)
     return accountChoice;
 }
 
-int choiceByAdvisor(vector<Compte>* accountsList, vector<Personne>* advisorsList)
+int choiceByAdvisor(vector<Compte*>* accountsList, vector<Personne*>* advisorsList)
 {
     long long unsigned int personChoice = -1;
     long long unsigned int accountChoice = -1;
@@ -275,7 +284,7 @@ int choiceByAdvisor(vector<Compte>* accountsList, vector<Personne>* advisorsList
         cout << "What is the name of the holder?" << endl;
         for (long unsigned int i = 0; i < advisorsList->size(); i++)
         {
-            cout << i << ") " << advisorsList->at(i).getFirstname() + " " + advisorsList->at(i).getLastname() << endl;
+            cout << i << ") " << advisorsList->at(i)->getFirstname() + " " + advisorsList->at(i)->getLastname() << endl;
         }
         cout << "> ";
         cin >> personChoice;
@@ -287,10 +296,10 @@ int choiceByAdvisor(vector<Compte>* accountsList, vector<Personne>* advisorsList
 
         for (long unsigned int i = 0; i < accountsList->size(); i++)
         {
-            if (accountsList->at(i).getAdvisor().getFirstname() == advisorsList->at(personChoice).getFirstname()
-            && accountsList->at(i).getAdvisor().getLastname() == advisorsList->at(personChoice).getLastname())
+            if (accountsList->at(i)->getAdvisor().getFirstname() == advisorsList->at(personChoice)->getFirstname()
+            && accountsList->at(i)->getAdvisor().getLastname() == advisorsList->at(personChoice)->getLastname())
             {
-                cout << i << ") " << accountsList->at(i).toString() << endl;
+                cout << i << ") " << accountsList->at(i)->toString() << endl;
             }
         }
         cout << "> ";
@@ -300,7 +309,7 @@ int choiceByAdvisor(vector<Compte>* accountsList, vector<Personne>* advisorsList
     return accountChoice;
 }
 
-void interaction(Compte& account)
+void interaction(Compte* account)
 {
     int userChoice = 0;
     float amount = 0.;
@@ -328,24 +337,24 @@ void interaction(Compte& account)
             cout << "How much do you want to deposit?" << endl;
             cout << "> ";
             cin >> amount;
-            account.addMovement(amount);
-            account.deposit(amount);
+            account->addMovement(amount);
+            account->deposit(amount);
             break;
 
         case 2: // Withdraw money
             cout << "How much do you want to withdraw?" << endl;
             cout << "> ";
             cin >> amount;
-            account.addMovement(amount*-1);
-            account.withdraw(amount);
+            account->addMovement(amount*-1);
+            account->withdraw(amount);
             break;
 
         case 3: // Consult balance
-            cout << "You have " << account.ConsultBalance() << " euros on this account." << endl;
+            cout << "You have " << account->ConsultBalance() << " euros on this account." << endl;
             break;
 
         case 4: // Consult operations
-            listOpe = account.consultOperations();
+            listOpe = account->consultOperations();
 
             for (Operation ope : listOpe)
             {
@@ -354,7 +363,7 @@ void interaction(Compte& account)
             break;
 
         case 5: // Consult debits
-            listOpe = account.consultDebit();
+            listOpe = account->consultDebit();
 
             for (Operation ope : listOpe)
             {
@@ -363,7 +372,7 @@ void interaction(Compte& account)
             break;
 
         case 6: // Consults credits
-            listOpe = account.consultCredit();
+            listOpe = account->consultCredit();
 
             for (Operation ope : listOpe)
             {
@@ -378,7 +387,7 @@ void interaction(Compte& account)
     }
 }
 
-void interact(vector<Compte>* accountsList, vector<Personne>* clientsList, vector<Personne>* advisorsList) {
+void interact(vector<Compte*>* accountsList, vector<Personne*>* clientsList, vector<Personne*>* advisorsList) {
     int choice = 0;
     int accountNumber = 0;
 
@@ -416,52 +425,49 @@ void interact(vector<Compte>* accountsList, vector<Personne>* clientsList, vecto
 int main() {
 
     // Vecteurs clients, conseillers, comptes
-    vector<Personne> clientsList;
-    vector<Personne> advisorsList;
-    vector<Compte> accountsList;
+    vector<Personne*> clientsList;
+    vector<Personne*> advisorsList;
+    vector<Compte*> accountsList;
     int answer(0);
 
+    // On crée des personnes pour préremplir le programme
     Personne *p1 = new Personne("Jean", "Todt", "ici");
     Personne *p2 = new Personne("Jean", "Todd", "la bas");
     Personne *p3 = new Personne("Marc", "Todt", "chez lui");
     Personne *p4 = new Personne("Yoann", "Le Saint", "Nantes DC");
     Personne *p5 = new Personne("Charlotte", "Todt", "NY");
 
-    clientsList.push_back(*p1);
-    clientsList.push_back(*p2);
-    clientsList.push_back(*p3);
-    clientsList.push_back(*p5);
+    clientsList.push_back(p1);
+    clientsList.push_back(p2);
+    clientsList.push_back(p3);
+    clientsList.push_back(p5);
 
-    advisorsList.push_back(*p4);
-    advisorsList.push_back(*p5);
+    advisorsList.push_back(p4);
+    advisorsList.push_back(p5);
 
+    // On crée des comptes pour préremplir le programme
     CompteEnLigne* account1 = new CompteEnLigne(p1, p5, 500);
-    //Compte *acc1 = &account1;
-    accountsList.push_back(*account1);
+    accountsList.push_back(account1);
 
     CompteEpargne *account2 = new CompteEpargne(p1, p5, 3540, 3);
-    accountsList.push_back(*account2);
+    accountsList.push_back(account2);
 
     CompteStandard *account3 = new CompteStandard(p2, p4, 500);
-    accountsList.push_back(*account3);
+    accountsList.push_back(account3);
 
     CompteStandard *account4 = new CompteStandard(p3, p4, 10);
-    accountsList.push_back(*account4);
+    accountsList.push_back(account4);
 
     CompteStandard *account5 = new CompteStandard(p5, p4, 10000);
-    accountsList.push_back(*account5);
+    accountsList.push_back(account5);
 
     while(true) {
-        for(long unsigned int i=0; i<accountsList.size(); i++)
-        {
-            cout << accountsList.at(i).toString() << " - " << accountsList.at(i).getAdvisor().toString() << endl;
-        }
-
         cout << "What do you want to do?" << endl;
         cout << "0) Quit." << endl;
         cout << "1) Add." << endl;
         cout << "2) Delete." << endl;
         cout << "3) Interact with an account." << endl;
+        cout << "4) Display all accounts." << endl;
         cout << "> ";
         cin >> answer;
 
@@ -478,10 +484,29 @@ int main() {
         case 3:
             interact(&accountsList, &clientsList, &advisorsList);
             break;
+        case 4:
+            displayAccount(&accountsList);
+            break;
         default:
             cout << "Not a defined option. Please try again." << endl;
             break;
         }
+    }
+
+    // On supprime les vecteurs pour éviter les fuites mémoires
+    for (int i = accountsList.size()-1; i >= 0; i--)
+    {
+        delete accountsList.at(i);
+    }
+
+    for (int i = advisorsList.size()-1; i >= 0; i--)
+    {
+        delete advisorsList.at(i);
+    }
+
+    for (int i = clientsList.size()-1; i >= 0; i--)
+    {
+        delete clientsList.at(i);
     }
 
     return 0;

@@ -49,5 +49,5 @@ public:
     vector<Operation> consultDebit();
     vector<Operation> consultCredit();
     void addMovement(float sum);
-    virtual string toString();
+    virtual string toString() = 0;
 };

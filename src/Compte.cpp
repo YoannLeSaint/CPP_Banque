@@ -70,13 +70,6 @@ void Compte::addMovement(float sum)
     this->p_historic.push_back(*ope);
 }
 
-string Compte::toString()
-{
-    stringstream ss;
-    ss << getHolder().toString() << " - " << getBalance() << "EUR" << endl;
-    return ss.str();
-}
-
 // Getters
 Personne Compte::getHolder() {
     return this->p_holder;

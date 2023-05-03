@@ -6,6 +6,10 @@ CompteStandard::CompteStandard(Personne* holder, Personne* advisor, float amount
 
 string CompteStandard::toString(){
     stringstream ss;
-	ss << getHolder().toString() << " (Compte Standard) - " << getBalance() << "EUR" << endl;
-	return ss.str();
+    if (getBalance() > 0){
+        ss << getHolder().toString() << " (Compte Standard) | +" << getBalance() << "EUR" << endl;
+    } else {
+        ss << getHolder().toString() << " (Compte Standard) | " << getBalance() << "EUR" << endl;
+    }
+    return ss.str();
 }
