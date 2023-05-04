@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <typeinfo>
+#include <memory>
 
 
 #include "./include/Compte.h"
