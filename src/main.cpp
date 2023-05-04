@@ -4,7 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <typeinfo>
-#include <memory>
+// #include <memory>
 
 
 #include "./include/Compte.h"
@@ -17,14 +17,14 @@
 using namespace std;
 
 
-int displayVector(vector<Personne*> *vect, string nameVect){
+int displayVector(vector<unique_ptr<Personne>> *vect, string nameVect){
     int index = 0;
 
     if (vect->size() == 0){
         cout << "No " << nameVect << " data." << endl << endl;
     } else {
         for (long long unsigned int i = 0; i < vect->size(); i++){
-            cout << "# " << i+1 << "\t" << vect->at(i)->toString() << endl;
+            cout << "# " << i+1 << "\t" << vect->at(i).get()->toString() << endl;
         }
         cout << "> ";
         cin >> index;
@@ -32,19 +32,19 @@ int displayVector(vector<Personne*> *vect, string nameVect){
     return index - 1;
 }
 
-void displayAccount(vector<Compte*> *acc){
+void displayAccount(vector<unique_ptr<Compte>> *acc){
     if (acc->size() == 0){
         cout << "No account." << endl << endl;
     } else {
         for (long long unsigned int i = 0; i < acc->size(); i++){
-            cout << "+ " << i+1 << " " << acc->at(i)->toString() << endl;
+            cout << "+ " << i+1 << " " << acc->at(i).get()->toString() << endl;
         }
     }
 }
 
-void add(vector<Personne*> *clientsList,
-         vector<Personne*> *advisorsList,
-         vector<Compte*>  *accountsList)
+void add(vector<unique_ptr<Personne>> *clientsList,
+         vector<unique_ptr<Personne>> *advisorsList,
+         vector<unique_ptr<Compte>>  *accountsList)
 {
     char anwserADD;
     while (true){
@@ -55,14 +55,17 @@ void add(vector<Personne*> *clientsList,
         switch (anwserADD){
         case 'a':
             {
-            Personne *pClient = new Personne(0);
-            clientsList->push_back(pClient);
+            // Personne *pClient = new Personne(0);
+            unique_ptr<Personne> pClient = make_unique<Personne>(0);
+            //clientsList->push_back(pClient);
+            clientsList->push_back(move(pClient));
             return;
             }
         case 'b':
             {
-            Personne* pAdviser = new Personne(0);
-            advisorsList->push_back(pAdviser);
+            //Personne* pAdviser = new Personne(0);
+            unique_ptr<Personne> pAdviser = make_unique<Personne>(0);
+            advisorsList->push_back(move(pAdviser));
             return;
             }
         case 'c':
@@ -90,8 +93,10 @@ void add(vector<Personne*> *clientsList,
                             cout << "Client amount : ";
                             cin >> amount;
                             cout << endl;
-                            CompteEnLigne *inlineAcc = new CompteEnLigne(clientsList->at(indexClient), advisorsList->at(indexAdvisor), amount);
-                            accountsList->push_back(inlineAcc);
+                            // CompteEnLigne *inlineAcc = new CompteEnLigne(clientsList->at(indexClient), advisorsList->at(indexAdvisor), amount);
+                            unique_ptr<Compte> inlineAcc = make_unique<CompteEnLigne>(clientsList->at(indexClient).get(), advisorsList->at(indexAdvisor).get(), amount);
+                            //accountsList->push_back(inlineAcc);
+                            accountsList->push_back(move(inlineAcc));
                         }
                         return;
                     }
@@ -107,8 +112,9 @@ void add(vector<Personne*> *clientsList,
                             cout << "Client amount : ";
                             cin >> amount;
                             cout << endl;
-                            CompteStandard *standardAcc = new CompteStandard(clientsList->at(indexClient), advisorsList->at(indexAdvisor), amount);
-                            accountsList->push_back(standardAcc);
+                            // CompteStandard *standardAcc = new CompteStandard(clientsList->at(indexClient), advisorsList->at(indexAdvisor), amount);
+                            unique_ptr<Compte> standardAcc = make_unique<CompteStandard>(clientsList->at(indexClient).get(), advisorsList->at(indexAdvisor).get(), amount);
+                            accountsList->push_back(move(standardAcc));
                         }
                         return;
                     }
@@ -127,8 +133,9 @@ void add(vector<Personne*> *clientsList,
                             cout << "Interest : ";
                             cin >> interest;
                             cout << endl;
-                            CompteEpargne *savingAcc = new CompteEpargne(clientsList->at(indexClient), advisorsList->at(indexAdvisor), amount, interest);
-                            accountsList->push_back(savingAcc);
+                            //CompteEpargne *savingAcc = new CompteEpargne(clientsList->at(indexClient), advisorsList->at(indexAdvisor), amount, interest);
+                            unique_ptr<Compte> savingAcc = make_unique<CompteEpargne>(clientsList->at(indexClient).get(), advisorsList->at(indexAdvisor).get(), amount, interest);
+                            accountsList->push_back(move(savingAcc));
                         }
                         return;
                     }
@@ -149,7 +156,7 @@ void add(vector<Personne*> *clientsList,
     }
 }
 
-void del(vector<Personne*>* clientsList, vector<Personne*>* advisorsList, vector<Compte*>* accountsList){
+void del(vector<unique_ptr<Personne>>* clientsList, vector<unique_ptr<Personne>>* advisorsList, vector<unique_ptr<Compte>>* accountsList){
     char answerDel;
     int x(0);
     while(true){
@@ -166,7 +173,7 @@ void del(vector<Personne*>* clientsList, vector<Personne*>* advisorsList, vector
                 } else {
                     for (long unsigned int i = 0; i < clientsList->size(); i++)
                     {
-                        cout << i << ") " << clientsList->at(i)->toString() << endl;
+                        cout << i << ") " << clientsList->at(i).get()->toString() << endl;
                     }
                     cout << "Please select the number of the client you want to delete : " << endl;
                     cout << "> ";
@@ -174,7 +181,7 @@ void del(vector<Personne*>* clientsList, vector<Personne*>* advisorsList, vector
 
                     for (long int i = accountsList->size() - 1; i >= 0; i--)
                     {
-                        if (accountsList->at(i)->getHolder().toString() == clientsList->at(x)->toString())
+                        if (accountsList->at(i).get()->getHolder().toString() == clientsList->at(x).get()->toString())
                         {
                             accountsList->erase(accountsList->begin()+i);
                         }
@@ -189,7 +196,7 @@ void del(vector<Personne*>* clientsList, vector<Personne*>* advisorsList, vector
                 } else {
                     for (long unsigned int i = 0; i < advisorsList->size(); i++)
                     {
-                        cout << i << ") " << advisorsList->at(i)->toString() << endl;
+                        cout << i << ") " << advisorsList->at(i).get()->toString() << endl;
                     }
 
                     cout << "Please select the number of the advisor you want to delete : " << endl;
@@ -199,18 +206,18 @@ void del(vector<Personne*>* clientsList, vector<Personne*>* advisorsList, vector
                     for (long unsigned int i = 0; i < accountsList->size(); i++)
                     {
                         int adv = 0;
-                        if (accountsList->at(i)->getAdvisor().toString() == advisorsList->at(x)->toString()){
+                        if (accountsList->at(i).get()->getAdvisor().toString() == advisorsList->at(x).get()->toString()){
                             cout << "Please select a new advisor for the following account : " << endl;
-                            cout << accountsList->at(i)->toString() << endl;
+                            cout << accountsList->at(i).get()->toString() << endl;
 
                             for (long unsigned int j = 0; j < advisorsList->size(); j++)
                             {
-                                if (advisorsList->at(j)->toString() != advisorsList->at(x)->toString())
-                                    cout << j << ") " << advisorsList->at(j)->toString();
+                                if (advisorsList->at(j).get()->toString() != advisorsList->at(x).get()->toString())
+                                    cout << j << ") " << advisorsList->at(j).get()->toString();
                             }
                             cout << endl << "> ";
                             cin >> adv;
-                            accountsList->at(i)->setAdvisor(advisorsList->at(adv));
+                            accountsList->at(i).get()->setAdvisor(advisorsList->at(adv).get());
                         }
                     }
                     advisorsList->erase(advisorsList->begin()+x);
@@ -223,7 +230,7 @@ void del(vector<Personne*>* clientsList, vector<Personne*>* advisorsList, vector
                 } else {
                     for (long unsigned int i = 0; i < accountsList->size(); i++)
                     {
-                        cout << i << ") " << accountsList->at(i)->toString();
+                        cout << i << ") " << accountsList->at(i).get()->toString();
                     }
                     cout << "Please select the number of the account you want to delete : " << endl;
                     cout << "> ";
@@ -241,7 +248,7 @@ void del(vector<Personne*>* clientsList, vector<Personne*>* advisorsList, vector
     }
 }
 
-int choiceByHolder(vector<Compte*>* accountsList, vector<Personne*>* clientsList)
+int choiceByHolder(vector<unique_ptr<Compte>>* accountsList, vector<unique_ptr<Personne>>* clientsList)
 {
     long long unsigned int personChoice = -1;
     long long unsigned int accountChoice = -1;
@@ -251,7 +258,7 @@ int choiceByHolder(vector<Compte*>* accountsList, vector<Personne*>* clientsList
         cout << "What is the name of the holder?" << endl;
         for (long unsigned int i = 0; i < clientsList->size(); i++)
         {
-            cout << i << ") " << clientsList->at(i)->getFirstname() + " " + clientsList->at(i)->getLastname() << endl;
+            cout << i << ") " << clientsList->at(i).get()->getFirstname() + " " + clientsList->at(i).get()->getLastname() << endl;
         }
         cout << "> ";
         cin >> personChoice;
@@ -263,10 +270,10 @@ int choiceByHolder(vector<Compte*>* accountsList, vector<Personne*>* clientsList
 
         for (long unsigned int i = 0; i < accountsList->size(); i++)
         {
-            if (accountsList->at(i)->getHolder().getFirstname() == clientsList->at(personChoice)->getFirstname()
-            && accountsList->at(i)->getHolder().getLastname() == clientsList->at(personChoice)->getLastname())
+            if (accountsList->at(i).get()->getHolder().getFirstname() == clientsList->at(personChoice).get()->getFirstname()
+            && accountsList->at(i).get()->getHolder().getLastname() == clientsList->at(personChoice).get()->getLastname())
             {
-                cout << i << ") " << accountsList->at(i)->toString() << endl;
+                cout << i << ") " << accountsList->at(i).get()->toString() << endl;
             }
         }
         cout << "> ";
@@ -276,7 +283,7 @@ int choiceByHolder(vector<Compte*>* accountsList, vector<Personne*>* clientsList
     return accountChoice;
 }
 
-int choiceByAdvisor(vector<Compte*>* accountsList, vector<Personne*>* advisorsList)
+int choiceByAdvisor(vector<unique_ptr<Compte>>* accountsList, vector<unique_ptr<Personne>>* advisorsList)
 {
     long long unsigned int personChoice = -1;
     long long unsigned int accountChoice = -1;
@@ -286,7 +293,7 @@ int choiceByAdvisor(vector<Compte*>* accountsList, vector<Personne*>* advisorsLi
         cout << "What is the name of the advisor?" << endl;
         for (long unsigned int i = 0; i < advisorsList->size(); i++)
         {
-            cout << i << ") " << advisorsList->at(i)->getFirstname() + " " + advisorsList->at(i)->getLastname() << endl;
+            cout << i << ") " << advisorsList->at(i).get()->getFirstname() + " " + advisorsList->at(i).get()->getLastname() << endl;
         }
         cout << "> ";
         cin >> personChoice;
@@ -298,10 +305,10 @@ int choiceByAdvisor(vector<Compte*>* accountsList, vector<Personne*>* advisorsLi
 
         for (long unsigned int i = 0; i < accountsList->size(); i++)
         {
-            if (accountsList->at(i)->getAdvisor().getFirstname() == advisorsList->at(personChoice)->getFirstname()
-            && accountsList->at(i)->getAdvisor().getLastname() == advisorsList->at(personChoice)->getLastname())
+            if (accountsList->at(i).get()->getAdvisor().getFirstname() == advisorsList->at(personChoice).get()->getFirstname()
+            && accountsList->at(i).get()->getAdvisor().getLastname() == advisorsList->at(personChoice).get()->getLastname())
             {
-                cout << i << ") " << accountsList->at(i)->toString() << endl;
+                cout << i << ") " << accountsList->at(i).get()->toString() << endl;
             }
         }
         cout << "> ";
@@ -389,7 +396,7 @@ void interaction(Compte* account)
     }
 }
 
-void interact(vector<Compte*>* accountsList, vector<Personne*>* clientsList, vector<Personne*>* advisorsList) {
+void interact(vector<unique_ptr<Compte>>* accountsList, vector<unique_ptr<Personne>>* clientsList, vector<unique_ptr<Personne>>* advisorsList) {
     int choice = 0;
     int accountNumber = 0;
 
@@ -409,12 +416,12 @@ void interact(vector<Compte*>* accountsList, vector<Personne*>* clientsList, vec
 
         case 1:
             accountNumber = choiceByHolder(accountsList, clientsList);
-            interaction(accountsList->at(accountNumber));
+            interaction(accountsList->at(accountNumber).get());
             return;
 
         case 2:
             accountNumber = choiceByAdvisor(accountsList, advisorsList);
-            interaction(accountsList->at(accountNumber));
+            interaction(accountsList->at(accountNumber).get());
             return;
 
         default:
@@ -427,41 +434,56 @@ void interact(vector<Compte*>* accountsList, vector<Personne*>* clientsList, vec
 int main() {
 
     // Vecteurs clients, conseillers, comptes
-    vector<Personne*> clientsList;
-    vector<Personne*> advisorsList;
-    vector<Compte*> accountsList;
+    // vector<Personne*> clientsList;
+    // vector<Personne*> advisorsList;
+    // vector<Compte*> accountsList;
+
+    vector<unique_ptr<Personne>> clientsList;
+    vector<unique_ptr<Personne>> advisorsList;
+    vector<unique_ptr<Compte>> accountsList;
     int answer(0);
 
     // On crée des personnes pour préremplir le programme
-    Personne *p1 = new Personne("Jean", "Todt", "ici");
-    Personne *p2 = new Personne("Jean", "Todd", "la bas");
-    Personne *p3 = new Personne("Marc", "Todt", "chez lui");
-    Personne *p4 = new Personne("Yoann", "Le Saint", "Nantes DC");
-    Personne *p5 = new Personne("Charlotte", "Todt", "NY");
+    // Personne *p1 = new Personne("Jean", "Todt", "ici");
+    // Personne *p2 = new Personne("Jean", "Todd", "la bas");
+    // Personne *p3 = new Personne("Marc", "Todt", "chez lui");
+    // Personne *p4 = new Personne("Yoann", "Le Saint", "Nantes DC");
+    // Personne *p5 = new Personne("Charlotte", "Todt", "NY");
 
-    clientsList.push_back(p1);
-    clientsList.push_back(p2);
-    clientsList.push_back(p3);
-    clientsList.push_back(p5);
+    unique_ptr<Personne> p1 = make_unique<Personne>("Jean", "Todt", "ici");
+    unique_ptr<Personne> p2 = make_unique<Personne>("Jean", "Todd", "la bas");
+    unique_ptr<Personne> p3 = make_unique<Personne>("Marc", "Todt", "chez lui");
+    unique_ptr<Personne> p4 = make_unique<Personne>("Yoann", "Le Saint", "Nantes DC");
+    unique_ptr<Personne> p5 = make_unique<Personne>("Charlotte", "Todt", "NY");
 
-    advisorsList.push_back(p4);
-    advisorsList.push_back(p5);
+    clientsList.push_back(move(p1));
+    clientsList.push_back(move(p2));
+    clientsList.push_back(move(p3));
+    //clientsList.push_back(move(p5));
+
+    advisorsList.push_back(move(p4));
+    advisorsList.push_back(move(p5));
 
     // On crée des comptes pour préremplir le programme
-    CompteEnLigne* account1 = new CompteEnLigne(p1, p5, 500);
-    accountsList.push_back(account1);
+    //CompteEnLigne* account1 = new CompteEnLigne(p1, p5, 500);
+    unique_ptr<Compte> account1 = make_unique<CompteEnLigne>(clientsList.at(0).get(), advisorsList.at(1).get(), 500.f);
+    accountsList.push_back(move(account1));
 
-    CompteEpargne *account2 = new CompteEpargne(p1, p5, 3540, 3);
-    accountsList.push_back(account2);
+    //CompteEpargne *account2 = new CompteEpargne(p1, p5, 3540, 3);
+    unique_ptr<Compte> account2 = make_unique<CompteEpargne>(clientsList.at(0).get(), advisorsList.at(1).get(), 3450.f, 3);
+    accountsList.push_back(move(account2));
 
-    CompteStandard *account3 = new CompteStandard(p2, p4, 500);
-    accountsList.push_back(account3);
+    //CompteStandard *account3 = new CompteStandard(p2, p4, 500);
+    unique_ptr<Compte> account3 = make_unique<CompteStandard>(clientsList.at(1).get(), advisorsList.at(0).get(), 500.f);
+    accountsList.push_back(move(account3));
 
-    CompteStandard *account4 = new CompteStandard(p3, p4, 10);
-    accountsList.push_back(account4);
+    //CompteStandard *account4 = new CompteStandard(p3, p4, 10);
+    unique_ptr<Compte> account4 = make_unique<CompteStandard>(clientsList.at(2).get(), advisorsList.at(0).get(), 10.f);
+    accountsList.push_back(move(account4));
 
-    CompteStandard *account5 = new CompteStandard(p5, p4, 10000);
-    accountsList.push_back(account5);
+    //CompteStandard *account5 = new CompteStandard(p5, p4, 10000);
+    unique_ptr<Compte> account5 = make_unique<CompteStandard>(clientsList.at(2).get(), advisorsList.at(0).get(), 10000.f);
+    accountsList.push_back(move(account5));
 
     while(true) {
         cout << "What do you want to do?" << endl;
@@ -496,7 +518,7 @@ int main() {
     }
 
     // On supprime les vecteurs pour éviter les fuites mémoires
-    for (int i = accountsList.size()-1; i >= 0; i--)
+    /*for (int i = accountsList.size()-1; i >= 0; i--)
     {
         delete accountsList.at(i);
     }
@@ -509,7 +531,7 @@ int main() {
     for (int i = clientsList.size()-1; i >= 0; i--)
     {
         delete clientsList.at(i);
-    }
+    }*/
 
     return 0;
 }
