@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <typeinfo>
+#include <thread>
 // #include <memory>
 
 
@@ -16,6 +17,27 @@
 
 using namespace std;
 
+
+void loading(){
+    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+    cout << "Loading" << endl;
+    this_thread::sleep_for(1000ms);
+    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+    cout << "Loading ." << endl;
+    this_thread::sleep_for(1000ms);
+    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+    cout << "Loading . ." << endl;
+    this_thread::sleep_for(1000ms);
+    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+    cout << "Loading . . ." << endl;
+    this_thread::sleep_for(1000ms);
+    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+}
 
 int displayVector(vector<unique_ptr<Personne>> *vect, string nameVect){
     int index = 0;
@@ -40,6 +62,7 @@ void displayAccount(vector<unique_ptr<Compte>> *acc){
             cout << "+ " << i+1 << " " << acc->at(i).get()->toString() << endl;
         }
     }
+    this_thread::sleep_for(5s);
 }
 
 void add(vector<unique_ptr<Personne>> *clientsList,
@@ -48,6 +71,8 @@ void add(vector<unique_ptr<Personne>> *clientsList,
 {
     char anwserADD;
     while (true){
+        loading();
+
         cout << "Which add do you want ?" << endl;
         cout <<  "\ta)Client\n\tb)Adviser\n\tc)Account\n\td)Back to main Menu" << endl;
         cout << "> ";
@@ -151,6 +176,7 @@ void add(vector<unique_ptr<Personne>> *clientsList,
             return;
         default:
             cout << "Invalid command, try again" << endl;
+            this_thread::sleep_for(3s);
             break;
         }
     }
@@ -160,6 +186,8 @@ void del(vector<unique_ptr<Personne>>* clientsList, vector<unique_ptr<Personne>>
     char answerDel;
     int x(0);
     while(true){
+        loading();
+
         cout << "What do you want to delete ?" << endl;
         cout << "\ta)Client\n\tb)Advisor\n\tc)Account\n\td)Back to main menu" << endl;
         cout << "> ";
@@ -243,6 +271,7 @@ void del(vector<unique_ptr<Personne>>* clientsList, vector<unique_ptr<Personne>>
                 return;
             default :
                 cout << "Invalid command, please try again.";
+                this_thread::sleep_for(3s);
                 break;
         }
     }
@@ -326,6 +355,8 @@ void interaction(Compte* account)
 
     while(true)
     {
+        loading();
+
         cout << "What do you want to do with this account ?" << endl;
         cout << "0) Back to main menu." << endl;
         cout << "1) Deposit money." << endl;
@@ -360,6 +391,7 @@ void interaction(Compte* account)
 
         case 3: // Consult balance
             cout << "You have " << account->ConsultBalance() << " euros on this account." << endl;
+            this_thread::sleep_for(3s);
             break;
 
         case 4: // Consult operations
@@ -369,6 +401,7 @@ void interaction(Compte* account)
             {
                 cout << "\t* " << ope.toString() << endl;
             }
+            this_thread::sleep_for(3s);
             break;
 
         case 5: // Consult debits
@@ -378,6 +411,7 @@ void interaction(Compte* account)
             {
                 cout << "\t* " << ope.toString() << endl;
             }
+            this_thread::sleep_for(3s);
             break;
 
         case 6: // Consults credits
@@ -387,10 +421,12 @@ void interaction(Compte* account)
             {
                 cout << "\t* " << ope.toString() << endl;
             }
+            this_thread::sleep_for(3s);
             break;
 
         default:
             cout << "Invalid command. Please try again." << endl;
+            this_thread::sleep_for(3s);
             break;
         }
     }
@@ -402,6 +438,8 @@ void interact(vector<unique_ptr<Compte>>* accountsList, vector<unique_ptr<Person
 
     while (true)
     {
+        loading();
+
         cout << "How do you want to select the account to interact with?" << endl;
         cout << "0) None. I want to quit." << endl;
         cout << "1) By Holder." << endl;
@@ -431,17 +469,34 @@ void interact(vector<unique_ptr<Compte>>* accountsList, vector<unique_ptr<Person
     }
 }
 
+
+void holdup(vector<unique_ptr<Compte>>* accountsList)
+{
+    int total = 0;
+    for(long unsigned int i = 0; i < accountsList->size(); i++)
+    {
+        int stolen = rand() % (int)(accountsList->at(i).get()->ConsultBalance());
+        total += stolen;
+        accountsList->at(i).get()->withdraw(stolen);
+    }
+
+    cout << "Ho no! Robbers stole " << total << " euros in the bank! Call the police!" << endl;
+    this_thread::sleep_for(3s);
+}
+
 int main() {
 
     // Vecteurs clients, conseillers, comptes
     // vector<Personne*> clientsList;
     // vector<Personne*> advisorsList;
     // vector<Compte*> accountsList;
+    srand(time(NULL));
 
     vector<unique_ptr<Personne>> clientsList;
     vector<unique_ptr<Personne>> advisorsList;
     vector<unique_ptr<Compte>> accountsList;
     int answer(0);
+    bool start = true;
 
     // On crée des personnes pour préremplir le programme
     // Personne *p1 = new Personne("Jean", "Todt", "ici");
@@ -486,12 +541,21 @@ int main() {
     accountsList.push_back(move(account5));
 
     while(true) {
+        loading();
+
+        if (start)
+        {
+            cout << "Welcome to bank simulator (free demo version)" << endl << endl;
+            start = false;
+        }
+
         cout << "What do you want to do?" << endl;
         cout << "0) Quit." << endl;
         cout << "1) Add." << endl;
         cout << "2) Delete." << endl;
         cout << "3) Interact with an account." << endl;
         cout << "4) Display all accounts." << endl;
+        cout << "5) Suffer a holdup." << endl;
         cout << "> ";
         cin >> answer;
 
@@ -511,8 +575,12 @@ int main() {
         case 4:
             displayAccount(&accountsList);
             break;
+        case 5:
+            holdup(&accountsList);
+            break;
         default:
             cout << "Not a defined option. Please try again." << endl;
+            this_thread::sleep_for(3s);
             break;
         }
     }
