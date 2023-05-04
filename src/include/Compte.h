@@ -32,7 +32,7 @@ protected:
 
 public:
     // Destructeur
-    ~Compte();
+    ~Compte() = default;
 
     // Getters
     Personne getHolder();

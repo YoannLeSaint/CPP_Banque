@@ -517,21 +517,5 @@ int main() {
         }
     }
 
-    // On supprime les vecteurs pour éviter les fuites mémoires
-    /*for (int i = accountsList.size()-1; i >= 0; i--)
-    {
-        delete accountsList.at(i);
-    }
-
-    for (int i = advisorsList.size()-1; i >= 0; i--)
-    {
-        delete advisorsList.at(i);
-    }
-
-    for (int i = clientsList.size()-1; i >= 0; i--)
-    {
-        delete clientsList.at(i);
-    }*/
-
     return 0;
 }
