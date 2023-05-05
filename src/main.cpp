@@ -446,7 +446,7 @@ void interact(vector<unique_ptr<Compte>>* accountsList, vector<unique_ptr<Person
         cout << "2) By Advisor." << endl;
         cout << "> ";
         cin >> choice;
- 
+  
         switch (choice)
         {
         case 0:
