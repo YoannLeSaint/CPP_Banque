@@ -42,7 +42,7 @@ string RecurrentOperation::toString(){
     stringstream ss;
     stringstream act;
 
-    if (getActive() == false){
+    if (!getActive()){
         act << "INACTIVE";
     } else {
         act << "ACTIVE -- frequency : " << getRecurrence().count() << " seconds";
@@ -68,15 +68,15 @@ void RecurrentOperation::incrCount() {
 chrono::seconds RecurrentOperation::getRecurrence(){ return this->p_recurrence; }
 bool RecurrentOperation::getActive(){ return this->p_active; }
 int RecurrentOperation::getCount(){ return this->p_count; }
-bool RecurrentOperation::getActiveThread(){ return this->p_activeThread; }
+bool RecurrentOperation::getActiveThread(){ return RecurrentOperation::p_activeThread; }
 
 // Setters
 void RecurrentOperation::setReccurence(chrono::seconds recurrence){
-    this-> p_recurrence = recurrence;
+    this->p_recurrence = recurrence;
 }
 
 void RecurrentOperation::setActive(bool active){
-    this-> p_active = active;
+    this->p_active = active;
 }
 
 void RecurrentOperation::setCount(int count){

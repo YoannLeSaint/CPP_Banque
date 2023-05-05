@@ -41,7 +41,7 @@ public:
     // Getters
     Personne getHolder();
     Personne getAdvisor();
-    vector<RecurrentOperation> getRecurrentOperations();
+    vector<RecurrentOperation>* getRecurrentOperations();
 
     // Setters
     void setAdvisor(Personne* advisor);

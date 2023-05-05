@@ -181,8 +181,8 @@ void add(vector<unique_ptr<Personne>> *clientsList,
     }
 }
 
-void del(vector<unique_ptr<Personne>>* clientsList, 
-         vector<unique_ptr<Personne>>* advisorsList, 
+void del(vector<unique_ptr<Personne>>* clientsList,
+         vector<unique_ptr<Personne>>* advisorsList,
          vector<unique_ptr<Compte>>* accountsList)
 {
     char answerDel;
@@ -279,7 +279,7 @@ void del(vector<unique_ptr<Personne>>* clientsList,
     }
 }
 
-int choiceByHolder(vector<unique_ptr<Compte>>* accountsList, 
+int choiceByHolder(vector<unique_ptr<Compte>>* accountsList,
                    vector<unique_ptr<Personne>>* clientsList)
 {
     long long unsigned int personChoice = -1;
@@ -351,12 +351,11 @@ int choiceByAdvisor(vector<unique_ptr<Compte>>* accountsList,
     return accountChoice;
 }
 
-void interaction(Compte* account)
+void interaction(Compte* account, vector<thread>* threadsList)
 {
     int userChoice = 0;
     float amount = 0.;
     vector<Operation> listOpe;
-    vector<RecurrentOperation> listRecOpe;
     int opeChoice = 0;
 
     while(true)
@@ -434,29 +433,35 @@ void interaction(Compte* account)
             break;
 
         case 7: // Create a new recurrent operation
+        {
             account->addRecurrentOperation();
+
+            //thread execOpe(&Compte::executeRecurrence, account, &account->getRecurrentOperations().back());
+            thread execOpe = thread(&Compte::executeRecurrence, account, &account->getRecurrentOperations()->back());
+            threadsList->push_back(move(execOpe));
             break;
+        }
 
-        case 8: // Cancel a recurrent operation
-            listRecOpe = account->getRecurrentOperations();
+        case 8: // Disable a recurrent operation
+            //listRecOpe = &account->getRecurrentOperations();
 
-            for (size_t i = 0; i < listRecOpe.size(); i++)
+            for (size_t i = 0; i < account->getRecurrentOperations()->size(); i++)
             {
-                cout << i << ") " << listRecOpe.at(i).toString() << endl;
+                cout << i << ") " << account->getRecurrentOperations()->at(i).toString() << endl;
             }
             cout << "Choose the number of the operation you want to disable :" << endl;
             cout << "> ";
             cin >> opeChoice;
 
-            listRecOpe.at(opeChoice).setActive(false);
+            account->getRecurrentOperations()->at(opeChoice).setActive(false);
             break;
 
         case 9: // Display list of recurrent operations
-            listRecOpe = account->getRecurrentOperations();
+            //listRecOpe = &account->getRecurrentOperations();
 
-            for (size_t i = 0; i < listRecOpe.size(); i++)
+            for (size_t i = 0; i < account->getRecurrentOperations()->size(); i++)
             {
-                cout << "\t* " << listRecOpe.at(i).toString() << endl;
+                cout << "\t* " << account->getRecurrentOperations()->at(i).toString() << endl;
             }
             break;
 
@@ -470,7 +475,8 @@ void interaction(Compte* account)
 
 void interact(vector<unique_ptr<Compte>>* accountsList,
               vector<unique_ptr<Personne>>* clientsList,
-              vector<unique_ptr<Personne>>* advisorsList)
+              vector<unique_ptr<Personne>>* advisorsList,
+              vector<thread>* threadsList)
 {
     int choice = 0;
     int accountNumber = 0;
@@ -493,12 +499,12 @@ void interact(vector<unique_ptr<Compte>>* accountsList,
 
         case 1:
             accountNumber = choiceByHolder(accountsList, clientsList);
-            interaction(accountsList->at(accountNumber).get());
+            interaction(accountsList->at(accountNumber).get(), threadsList);
             return;
 
         case 2:
             accountNumber = choiceByAdvisor(accountsList, advisorsList);
-            interaction(accountsList->at(accountNumber).get());
+            interaction(accountsList->at(accountNumber).get(), threadsList);
             return;
 
         default:
@@ -524,26 +530,18 @@ void holdup(vector<unique_ptr<Compte>>* accountsList)
 }
 
 int main() {
-
-    // Vecteurs clients, conseillers, comptes
-    // vector<Personne*> clientsList;
-    // vector<Personne*> advisorsList;
-    // vector<Compte*> accountsList;
     srand(time(NULL));
 
+    // Vecteurs clients, conseillers, comptes
     vector<unique_ptr<Personne>> clientsList;
     vector<unique_ptr<Personne>> advisorsList;
     vector<unique_ptr<Compte>> accountsList;
+    vector<thread> threadsList;
+
     int answer(0);
     bool start = true;
 
     // On crée des personnes pour préremplir le programme
-    // Personne *p1 = new Personne("Jean", "Todt", "ici");
-    // Personne *p2 = new Personne("Jean", "Todd", "la bas");
-    // Personne *p3 = new Personne("Marc", "Todt", "chez lui");
-    // Personne *p4 = new Personne("Yoann", "Le Saint", "Nantes DC");
-    // Personne *p5 = new Personne("Charlotte", "Todt", "NY");
-
     unique_ptr<Personne> p1 = make_unique<Personne>("Jean", "Todt", "ici");
     unique_ptr<Personne> p2 = make_unique<Personne>("Jean", "Todd", "la bas");
     unique_ptr<Personne> p3 = make_unique<Personne>("Marc", "Todt", "chez lui");
@@ -553,29 +551,23 @@ int main() {
     clientsList.push_back(move(p1));
     clientsList.push_back(move(p2));
     clientsList.push_back(move(p3));
-    //clientsList.push_back(move(p5));
 
     advisorsList.push_back(move(p4));
     advisorsList.push_back(move(p5));
 
     // On crée des comptes pour préremplir le programme
-    //CompteEnLigne* account1 = new CompteEnLigne(p1, p5, 500);
     unique_ptr<Compte> account1 = make_unique<CompteEnLigne>(clientsList.at(0).get(), advisorsList.at(1).get(), 500.f);
     accountsList.push_back(move(account1));
 
-    //CompteEpargne *account2 = new CompteEpargne(p1, p5, 3540, 3);
     unique_ptr<Compte> account2 = make_unique<CompteEpargne>(clientsList.at(0).get(), advisorsList.at(1).get(), 3450.f, 3);
     accountsList.push_back(move(account2));
 
-    //CompteStandard *account3 = new CompteStandard(p2, p4, 500);
     unique_ptr<Compte> account3 = make_unique<CompteStandard>(clientsList.at(1).get(), advisorsList.at(0).get(), 500.f);
     accountsList.push_back(move(account3));
 
-    //CompteStandard *account4 = new CompteStandard(p3, p4, 10);
     unique_ptr<Compte> account4 = make_unique<CompteStandard>(clientsList.at(2).get(), advisorsList.at(0).get(), 10.f);
     accountsList.push_back(move(account4));
 
-    //CompteStandard *account5 = new CompteStandard(p5, p4, 10000);
     unique_ptr<Compte> account5 = make_unique<CompteStandard>(clientsList.at(2).get(), advisorsList.at(0).get(), 10000.f);
     accountsList.push_back(move(account5));
 
@@ -600,12 +592,21 @@ int main() {
 
         switch (answer){
         case 0:
+            // On passe l'attribut p_activeThread de RecurrentOperation à false pour stopper tous les threads
             for (size_t i = 0; i < accountsList.size(); i++)
             {
-                if (accountsList.at(i).get()->getRecurrentOperations().size()>0)
+                if (accountsList.at(i).get()->getRecurrentOperations()->size()>0)
                 {
-                    accountsList.at(i).get()->getRecurrentOperations().at(0).setActiveThread(false);
+                    accountsList.at(i).get()->getRecurrentOperations()->at(0).setActiveThread(false);
                     break;
+                }
+            }
+
+            // On s'assure que tous les threads sont terminés avant de quitter
+            for (size_t i = 0; i < threadsList.size(); i++)
+            {
+                if (threadsList.at(i).joinable()){
+                    threadsList.at(i).join();
                 }
             }
 
@@ -618,7 +619,7 @@ int main() {
             del(&clientsList, &advisorsList, &accountsList);
             break;
         case 3:
-            interact(&accountsList, &clientsList, &advisorsList);
+            interact(&accountsList, &clientsList, &advisorsList, &threadsList);
             break;
         case 4:
             displayAccount(&accountsList);
