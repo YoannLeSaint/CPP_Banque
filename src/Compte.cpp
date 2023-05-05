@@ -8,15 +8,6 @@ Compte::Compte(Personne* holder, Personne* advisor, float amount) {
     this->p_balance = amount;
 }
 
-// Destructeur
-Compte::~Compte()
-{
-    for (int i = this->p_historic.size()-1; i >= 0; i--)
-    {
-        delete &this->p_historic[i];
-    }
-}
-
 void Compte::deposit(float amount) {
     this->p_balance += amount;
 }
