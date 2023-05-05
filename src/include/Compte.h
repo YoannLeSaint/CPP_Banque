@@ -4,8 +4,10 @@
 #include <string>
 #include <chrono>
 #include <typeinfo>
+#include <thread>
 #include "Personne.h"
 #include "Operation.h"
+#include "RecurrentOperation.h"
 using namespace std;
 
 class Compte
@@ -14,6 +16,7 @@ private:
     Personne p_holder;
     Personne p_advisor;
     vector<Operation> p_historic;
+    vector<RecurrentOperation> p_recurrentOperations;
     float p_balance;
 
 protected:
@@ -29,14 +32,16 @@ protected:
     void setHolder(Personne* holder);
     void setHistoric(vector<Operation> historic);
     void setBalance(float balance);
+    void setRecurrentOperations(vector<RecurrentOperation> recurrentOperations);
 
 public:
     // Destructeur
-    ~Compte();
+    ~Compte() = default;
 
     // Getters
     Personne getHolder();
     Personne getAdvisor();
+    vector<RecurrentOperation>* getRecurrentOperations();
 
     // Setters
     void setAdvisor(Personne* advisor);
@@ -50,4 +55,6 @@ public:
     vector<Operation> consultCredit();
     void addMovement(float sum);
     virtual string toString() = 0;
+    void executeRecurrence(RecurrentOperation* ope);
+    void addRecurrentOperation();
 };

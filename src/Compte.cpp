@@ -8,15 +8,6 @@ Compte::Compte(Personne* holder, Personne* advisor, float amount) {
     this->p_balance = amount;
 }
 
-// Destructeur
-Compte::~Compte()
-{
-    for (int i = this->p_historic.size()-1; i >= 0; i--)
-    {
-        delete &this->p_historic[i];
-    }
-}
-
 void Compte::deposit(float amount) {
     this->p_balance += amount;
 }
@@ -70,6 +61,23 @@ void Compte::addMovement(float sum)
     this->p_historic.push_back(*ope);
 }
 
+void Compte::executeRecurrence(RecurrentOperation* ope)
+{
+
+    while(ope->getActive() && ope->getActiveThread())
+    {
+        this_thread::sleep_for(ope->getRecurrence());
+        this->p_balance += ope->getSum();
+        ope->incrCount();
+    }
+}
+
+void Compte::addRecurrentOperation()
+{
+    RecurrentOperation* ope = new RecurrentOperation();
+    this->p_recurrentOperations.push_back(*move(ope));
+}
+
 // Getters
 Personne Compte::getHolder() {
     return this->p_holder;
@@ -87,6 +95,11 @@ float Compte::getBalance() {
     return this->p_balance;
 }
 
+vector<RecurrentOperation>* Compte::getRecurrentOperations()
+{
+    return &this->p_recurrentOperations;
+}
+
 // Setters
 void Compte::setHolder(Personne* holder) {
     this->p_holder = *holder;
@@ -102,4 +115,9 @@ void Compte::setHistoric(vector<Operation> historic) {
 
 void Compte::setBalance(float balance) {
     this->p_balance = balance;
+}
+
+void Compte::setRecurrentOperations(vector<RecurrentOperation> recurrentOperations)
+{
+    this->p_recurrentOperations = recurrentOperations;
 }
