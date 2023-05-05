@@ -5,8 +5,7 @@
 #include <algorithm>
 #include <typeinfo>
 #include <thread>
-// #include <memory>
-
+#include <mutex>
 
 #include "./include/Compte.h"
 #include "./include/CompteEnLigne.h"
@@ -18,26 +17,26 @@
 using namespace std;
 
 
-void loading(){
-    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-    cout << "Loading" << endl;
-    this_thread::sleep_for(1000ms);
-    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-    cout << "Loading ." << endl;
-    this_thread::sleep_for(1000ms);
-    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-    cout << "Loading . ." << endl;
-    this_thread::sleep_for(1000ms);
-    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-    cout << "Loading . . ." << endl;
-    this_thread::sleep_for(1000ms);
-    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-    cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-}
+// void loading(){
+//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+//     cout << "Loading" << endl;
+//     this_thread::sleep_for(1000ms);
+//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+//     cout << "Loading ." << endl;
+//     this_thread::sleep_for(1000ms);
+//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+//     cout << "Loading . ." << endl;
+//     this_thread::sleep_for(1000ms);
+//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+//     cout << "Loading . . ." << endl;
+//     this_thread::sleep_for(1000ms);
+//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
+// }
 
 int displayVector(vector<unique_ptr<Personne>> *vect, string nameVect){
     int index = 0;
@@ -71,7 +70,7 @@ void add(vector<unique_ptr<Personne>> *clientsList,
 {
     char anwserADD;
     while (true){
-        loading();
+        //loading();
 
         cout << "Which add do you want ?" << endl;
         cout <<  "\ta)Client\n\tb)Adviser\n\tc)Account\n\td)Back to main Menu" << endl;
@@ -182,11 +181,14 @@ void add(vector<unique_ptr<Personne>> *clientsList,
     }
 }
 
-void del(vector<unique_ptr<Personne>>* clientsList, vector<unique_ptr<Personne>>* advisorsList, vector<unique_ptr<Compte>>* accountsList){
+void del(vector<unique_ptr<Personne>>* clientsList, 
+         vector<unique_ptr<Personne>>* advisorsList, 
+         vector<unique_ptr<Compte>>* accountsList)
+{
     char answerDel;
     int x(0);
     while(true){
-        loading();
+        // loading();
 
         cout << "What do you want to delete ?" << endl;
         cout << "\ta)Client\n\tb)Advisor\n\tc)Account\n\td)Back to main menu" << endl;
@@ -277,7 +279,8 @@ void del(vector<unique_ptr<Personne>>* clientsList, vector<unique_ptr<Personne>>
     }
 }
 
-int choiceByHolder(vector<unique_ptr<Compte>>* accountsList, vector<unique_ptr<Personne>>* clientsList)
+int choiceByHolder(vector<unique_ptr<Compte>>* accountsList, 
+                   vector<unique_ptr<Personne>>* clientsList)
 {
     long long unsigned int personChoice = -1;
     long long unsigned int accountChoice = -1;
@@ -312,7 +315,8 @@ int choiceByHolder(vector<unique_ptr<Compte>>* accountsList, vector<unique_ptr<P
     return accountChoice;
 }
 
-int choiceByAdvisor(vector<unique_ptr<Compte>>* accountsList, vector<unique_ptr<Personne>>* advisorsList)
+int choiceByAdvisor(vector<unique_ptr<Compte>>* accountsList,
+                    vector<unique_ptr<Personne>>* advisorsList)
 {
     long long unsigned int personChoice = -1;
     long long unsigned int accountChoice = -1;
@@ -352,10 +356,12 @@ void interaction(Compte* account)
     int userChoice = 0;
     float amount = 0.;
     vector<Operation> listOpe;
+    vector<RecurrentOperation> listRecOpe;
+    int opeChoice = 0;
 
     while(true)
     {
-        loading();
+        //loading();
 
         cout << "What do you want to do with this account ?" << endl;
         cout << "0) Back to main menu." << endl;
@@ -365,6 +371,9 @@ void interaction(Compte* account)
         cout << "4) Consult operations." << endl;
         cout << "5) Consult debits." << endl;
         cout << "6) Consult credits." << endl;
+        cout << "7) Create a new recurrent operation." << endl;
+        cout << "8) Disable a recurrent operation." << endl;
+        cout << "9) Display list of recurrent operations." << endl;
         cout << "> ";
         cin >> userChoice;
 
@@ -424,6 +433,33 @@ void interaction(Compte* account)
             this_thread::sleep_for(3s);
             break;
 
+        case 7: // Create a new recurrent operation
+            account->addRecurrentOperation();
+            break;
+
+        case 8: // Cancel a recurrent operation
+            listRecOpe = account->getRecurrentOperations();
+
+            for (size_t i = 0; i < listRecOpe.size(); i++)
+            {
+                cout << i << ") " << listRecOpe.at(i).toString() << endl;
+            }
+            cout << "Choose the number of the operation you want to disable :" << endl;
+            cout << "> ";
+            cin >> opeChoice;
+
+            listRecOpe.at(opeChoice).setActive(false);
+            break;
+
+        case 9: // Display list of recurrent operations
+            listRecOpe = account->getRecurrentOperations();
+
+            for (size_t i = 0; i < listRecOpe.size(); i++)
+            {
+                cout << "\t* " << listRecOpe.at(i).toString() << endl;
+            }
+            break;
+
         default:
             cout << "Invalid command. Please try again." << endl;
             this_thread::sleep_for(3s);
@@ -432,13 +468,16 @@ void interaction(Compte* account)
     }
 }
 
-void interact(vector<unique_ptr<Compte>>* accountsList, vector<unique_ptr<Personne>>* clientsList, vector<unique_ptr<Personne>>* advisorsList) {
+void interact(vector<unique_ptr<Compte>>* accountsList,
+              vector<unique_ptr<Personne>>* clientsList,
+              vector<unique_ptr<Personne>>* advisorsList)
+{
     int choice = 0;
     int accountNumber = 0;
 
     while (true)
     {
-        loading();
+        // loading();
 
         cout << "How do you want to select the account to interact with?" << endl;
         cout << "0) None. I want to quit." << endl;
@@ -446,7 +485,7 @@ void interact(vector<unique_ptr<Compte>>* accountsList, vector<unique_ptr<Person
         cout << "2) By Advisor." << endl;
         cout << "> ";
         cin >> choice;
-  
+
         switch (choice)
         {
         case 0:
@@ -541,7 +580,7 @@ int main() {
     accountsList.push_back(move(account5));
 
     while(true) {
-        loading();
+        //loading();
 
         if (start)
         {
@@ -561,6 +600,15 @@ int main() {
 
         switch (answer){
         case 0:
+            for (size_t i = 0; i < accountsList.size(); i++)
+            {
+                if (accountsList.at(i).get()->getRecurrentOperations().size()>0)
+                {
+                    accountsList.at(i).get()->getRecurrentOperations().at(0).setActiveThread(false);
+                    break;
+                }
+            }
+
             cout << "Good bye!" << endl;
             return 0;
         case 1:

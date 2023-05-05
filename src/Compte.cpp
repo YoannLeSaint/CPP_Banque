@@ -61,6 +61,35 @@ void Compte::addMovement(float sum)
     this->p_historic.push_back(*ope);
 }
 
+void Compte::executeRecurrence(RecurrentOperation* ope)
+{
+
+    cout << "TOTO 3" << endl;
+
+    while(ope->getActive() && ope->getActiveThread())
+    {
+        this_thread::sleep_for(ope->getRecurrence());
+        this->p_balance += ope->getSum();
+        ope->incrCount();
+        cout << "Je suis une opération récurrente." << endl;
+    }
+
+    cout << "Je meurt !" << endl;
+}
+
+void Compte::addRecurrentOperation()
+{
+    RecurrentOperation* ope = new RecurrentOperation();
+
+    cout << "TOTO 1" << endl;
+
+    this->p_recurrentOperations.push_back(*ope);
+
+    cout << "TOTO 2" << endl;
+
+    thread execOpe(&Compte::executeRecurrence, this, ope);
+}
+
 // Getters
 Personne Compte::getHolder() {
     return this->p_holder;
@@ -78,6 +107,11 @@ float Compte::getBalance() {
     return this->p_balance;
 }
 
+vector<RecurrentOperation> Compte::getRecurrentOperations()
+{
+    return this->p_recurrentOperations;
+}
+
 // Setters
 void Compte::setHolder(Personne* holder) {
     this->p_holder = *holder;
@@ -93,4 +127,9 @@ void Compte::setHistoric(vector<Operation> historic) {
 
 void Compte::setBalance(float balance) {
     this->p_balance = balance;
+}
+
+void Compte::setRecurrentOperations(vector<RecurrentOperation> recurrentOperations)
+{
+    this->p_recurrentOperations = recurrentOperations;
 }
