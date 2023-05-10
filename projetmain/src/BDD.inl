@@ -1,16 +1,20 @@
+#ifdef _WIN32
 #include "./include/BDD.h"
+#endif
 
 template <class T>
 BDD<T>::BDD(string name, string rqt_create, vector<string> column) {
-    this-> setName(name);
-    this-> setColumns(column);
+    this->setName(name);
+    this->setColumn(column);
     char* errorMsg = 0;
     int rc = 0;
 
-    rc = sqlite3_open("BDD.db", &getDb());
+    rc = sqlite3_open("BDD.db", &p_db);
 
-    if (rc != SQLITE_OK) cerr << "BDD.db could not be opened : " << errorMsg << endl;
-    else cout << "BDD.db opened." << endl;
+    if (rc != SQLITE_OK)
+        cerr << "BDD.db could not be opened : " << errorMsg << endl;
+    else
+        cout << "BDD.db opened." << endl;
 
     // arg1 = database
     // arg2 = requête à exécuter
@@ -19,8 +23,10 @@ BDD<T>::BDD(string name, string rqt_create, vector<string> column) {
     // arg5 = Variable qui stocke le message d'erreur (en cas d'erreur)
     rc = sqlite3_exec(getDb(), rqt_create.c_str(), 0, 0, &errorMsg);
 
-    if (rc != SQLITE_OK) cerr << "Table could not be created : " << errorMsg << endl;
-    else cout << name << " created." << endl;
+    if (rc != SQLITE_OK)
+        cerr << "Table could not be created : " << errorMsg << endl;
+    else
+        cout << name << " created." << endl;
 
     sqlite3_close(getDb());
     cout << "BDD.db closed." << endl;
@@ -41,7 +47,7 @@ void BDD<T>::display(){
     char* errorMsg = 0;
     int rc(0);
 
-    rc = sqlite3_exec(getDb(), "SELECT * FROM " + getName(), callback_function, 0, 0);
+    rc = sqlite3_exec(getDb(), "SELECT * FROM " + getName(), callback_function, 0, &errorMsg);
 
     if (rc != SQLITE_OK) cerr << "Table could not be printed : " << errorMsg << endl;
 }
@@ -49,30 +55,45 @@ void BDD<T>::display(){
 template <class T>
 void BDD<T>::add(T *temp){
     int rc(0);
-    string s;
-    vector<string> colomn = getColumn();
-    for (int i = 1; i < colomn.size(); i++){ s+ = colomn[i-1] + ", "; }
-    s += colomn[i];
+    char* errorMsg = 0;
+    stringstream ss;
+    string s = "";
+    vector<string> colomn = getColumns();
 
-    rc = sqlite3_exec(getDb(), "INSERT INTO " + getName() + " (" + s + ") VALUES (" + temp + ")" , 0, 0, 0);
-    
-    if (rc != SQLITE_OK) cerr << "Could not insert into table : " << errorMsg << endl;
-    else cout << "Insert into " << getName() << " done." << endl;
+    for (int i = 1; i < colomn.size(); i++)
+    {
+        s += colomn[i-1] + ", ";
+    }
+    s += colomn[colomn.size()-1];
+
+    ss << "INSERT INTO " << getName() << " (" << s << ") VALUES (" << temp << ")";
+
+    cout << "---------" << typeid(T).name() << endl;
+
+    rc = sqlite3_exec(getDb(), ss.str().c_str() , 0, 0, &errorMsg);
+
+    if (rc != SQLITE_OK)
+        cerr << "Could not insert into table : " << errorMsg << endl;
+    else
+        cout << "Insertion into " << getName() << " done." << endl;
 
 }
-// INSERT INTO table (colonne1, ) VALES (values)
+
 
 template <class T>
 int BDD<T>::size() {
     vector<string> col;
-    int rc(0);
-    return sqlite3_exec(getDb(), "SELECT COUNT(ID) FROM " + getName(), 0, 0, 0);
-    return col;
+    stringstream ss;
+    ss << "SELECT COUNT(ID) FROM " << getName() << ";";
+
+    return sqlite3_exec(getDb(), ss.str().c_str(), 0, 0, 0);
+    //return col;
 }
 
 template <class T>
 T BDD<T>::operator[](int i) {
     int rc(0);
+    char* errorMsg = 0;
     T res;
     string rqt;
     sqlite3_stmt* stmt;
@@ -107,17 +128,17 @@ T BDD<T>::operator[](int i) {
             return Personne(sqlite3_column_text(stmt, 1), sqlite3_column_text(stmt, 2), sqlite3_column_text(stmt, 3));
         }
         else if (typeid(res).name() == "Operation"){
-            return Operation(sqlite3_column_text(stmt, 2), sqlite3_column_text(stmt, 3), (float)sqlite3_column_float(stmt, 4));
+            return Operation(sqlite3_column_text(stmt, 2), sqlite3_column_text(stmt, 3), (float)sqlite3_column_double(stmt, 4));
         }
         else // C'est un compte
         {
             switch (sqlite3_column_int(stmt, 1)){
             case 0: // En Ligne
-                return CompteEnLigne(sqlite3_column_text(stmt, 2), sqlite3_column_text(stmt, 3), (float)sqlite3_column_float(stmt, 4));
+                return CompteEnLigne(sqlite3_column_text(stmt, 2), sqlite3_column_text(stmt, 3), (float)sqlite3_column_double(stmt, 4));
             case 1: // Epargne
-                return CompteEpargne(sqlite3_column_text(stmt, 2), sqlite3_column_text(stmt, 2), sqlite3_column_text(stmt, 2)); 
+                return CompteEpargne(sqlite3_column_text(stmt, 2), sqlite3_column_text(stmt, 3), (float)sqlite3_column_double(stmt, 4), (float)sqlite3_column_double(stmt, 5));
             case 2: // Standard
-                return CompteStandard();
+                return CompteStandard(sqlite3_column_text(stmt, 2), sqlite3_column_text(stmt, 3), (float)sqlite3_column_double(stmt, 4));
             }
         }
     }
@@ -129,17 +150,20 @@ T BDD<T>::operator[](int i) {
     // Fermeture de la base de données
     sqlite3_close(getDb());
 
-    return sqlite3_exec(getDb(), "SELECT * FROM " + getName(), 0, 0, 0);
+    return res;
 }
 
 
 
 // Getters
 template <class T>
-string BDD<T>::getName(){ return this-> p_name; }
+string BDD<T>::getName(){ return this->p_name; }
 
 template <class T>
-int BDD<T>::getColumns() { return this-> p_column; }
+vector<string> BDD<T>::getColumns() { return this->p_column; }
+
+template <class T>
+sqlite3* BDD<T>::getDb() { return this->p_db; }
 
 
 // Setters

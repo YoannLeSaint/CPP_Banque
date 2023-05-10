@@ -519,24 +519,26 @@ int main() {
     bool start = true;
 
     // Création de la table des clients
-    rqt_create = "CREATE TABLE IF NOT EXISTS Client"    \
+    rqt_create = "CREATE TABLE IF NOT EXISTS Client ("  \
                  "ID          INTEGER  PRIMARY KEY,"    \
                  "FirstName   TEXT     NOT NULL,"       \
                  "LastName    TEXT     NOT NULL,"       \
                  "Address     TEXT     NOT NULL);";
     vector<string> col1{"FirstName", "LastName", "Address"};
-    BDD<Personne>* tableClients = new BDD<Personne>("Client", rqt_create, col1);
+    //BDD<Personne>* tableClients = new BDD<Personne>("Client", rqt_create, col1);
+    BDD<Personne> tableClients("Client", rqt_create, col1);
 
     // Création de la table des conseillers
-    rqt_create = "CREATE TABLE IF NOT EXISTS Advisor"   \
+    rqt_create = "CREATE TABLE IF NOT EXISTS Advisor (" \
                  "ID          INTEGER  PRIMARY KEY,"    \
                  "FirstName   TEXT     NOT NULL,"       \
                  "LastName    TEXT     NOT NULL,"       \
                  "Address     TEXT     NOT NULL);";
-    BDD<Personne>* tableAdvisors = new BDD<Personne>("Advisor", rqt_create, col1);
+    //BDD<Personne>* tableAdvisors = new BDD<Personne>("Advisor", rqt_create, col1);
+    BDD<Personne> tableAdvisors("Advisor", rqt_create, col1);
 
     // Création de la table des comptes
-    rqt_create = "CREATE TABLE IF NOT EXISTS Account"   \
+    rqt_create = "CREATE TABLE IF NOT EXISTS Account (" \
                  "ID          INTEGER  PRIMARY KEY,"    \
                  "Type        INTEGER  NOT NULL,"       \
                  "HolderId    INTEGER  NOT NULL,"       \
@@ -545,21 +547,23 @@ int main() {
                  "Interest    FLOAT);";
 
     vector<string> col2{"Type", "HolderId", "AdvisorId", "Balance", "Interest"};
-    BDD<Compte>* tableAccounts = new BDD<Compte>("Account", rqt_create, col2);
+    //BDD<Compte>* tableAccounts = new BDD<Compte>("Account", rqt_create, col2);
+    BDD<Compte> tableAccounts("Account", rqt_create, col2);
 
     //Création de la table des opérations
-    rqt_create = "CREATE TABLE IF NOT EXISTS Operation" \
-                 "ID          INTEGER  PRIMARY KEY,"    \
-                 "AccountId   INTEGER  NOT NULL,"       \
-                 "Date        TEXT     NOT NULL,"       \
-                 "Name        TEXT     NOT NULL,"       \
-                 "Sum         FLOAT    NOT NULL,"       \
-                 "Reccurrence INTEGER,"                 \
-                 "Active      BOOLEAN,"                 \
+    rqt_create = "CREATE TABLE IF NOT EXISTS Operation ("\
+                 "ID          INTEGER  PRIMARY KEY,"     \
+                 "AccountId   INTEGER  NOT NULL,"        \
+                 "Date        TEXT     NOT NULL,"        \
+                 "Name        TEXT     NOT NULL,"        \
+                 "Sum         FLOAT    NOT NULL,"        \
+                 "Reccurrence INTEGER,"                  \
+                 "Active      BOOLEAN,"                  \
                  "Count       INTEGER);";
 
     vector<string> col3{"AccountId", "Date", "Name", "Sum", "Reccurrence", "Active", "Count"};
-    BDD<Operation>* tableOperations = new BDD<Operation>("Operation", rqt_create, col3);
+    //BDD<Operation>* tableOperations = new BDD<Operation>("Operation", rqt_create, col3);
+    BDD<Operation> tableOperations("Operation", rqt_create, col3);
 
 
     // On crée des personnes pour préremplir le programme
@@ -569,30 +573,45 @@ int main() {
     unique_ptr<Personne> p4 = make_unique<Personne>("Yoann", "Le Saint", "Nantes DC");
     unique_ptr<Personne> p5 = make_unique<Personne>("Charlotte", "Todt", "NY");
 
-    tableClients->add(p1.get());
-    tableClients->add(p2.get());
-    tableClients->add(p3.get());
-    tableClients->add(p4.get());
-    tableClients->add(p5.get());
+    // tableClients->add(p1.get());
+    // tableClients->add(p2.get());
+    // tableClients->add(p3.get());
+    // tableClients->add(p4.get());
+    // tableClients->add(p5.get());
 
-    tableAdvisors->add(p4.get());
-    tableAdvisors->add(p5.get());
+    // tableAdvisors->add(p4.get());
+    // tableAdvisors->add(p5.get());
+
+
+    tableClients.add(p1.get());
+    tableClients.add(p2.get());
+    tableClients.add(p3.get());
+    tableClients.add(p4.get());
+    tableClients.add(p5.get());
+
+    tableAdvisors.add(p4.get());
+    tableAdvisors.add(p5.get());
 
     // On crée des comptes pour préremplir le programme
     unique_ptr<Compte> account1 = make_unique<CompteEnLigne>(clientsList.at(0).get(), advisorsList.at(1).get(), 500.f);
-    tableAccounts->add(account1.get());
-    
+    //tableAccounts->add(account1.get());
+    tableAccounts.add(account1.get());
+
     unique_ptr<Compte> account2 = make_unique<CompteEpargne>(clientsList.at(0).get(), advisorsList.at(1).get(), 3450.f, 3);
-    tableAccounts->add(account2.get());
+    //tableAccounts->add(account2.get());
+    tableAccounts.add(account2.get());
 
     unique_ptr<Compte> account3 = make_unique<CompteStandard>(clientsList.at(1).get(), advisorsList.at(0).get(), 500.f);
-    tableAccounts->add(account3.get());
+    //tableAccounts->add(account3.get());
+    tableAccounts.add(account3.get());
 
     unique_ptr<Compte> account4 = make_unique<CompteStandard>(clientsList.at(2).get(), advisorsList.at(0).get(), 10.f);
-    tableAccounts->add(account4.get());
+    //tableAccounts->add(account4.get());
+    tableAccounts.add(account4.get());
 
     unique_ptr<Compte> account5 = make_unique<CompteStandard>(clientsList.at(2).get(), advisorsList.at(0).get(), 10000.f);
-    tableAccounts->add(account5.get());
+    //tableAccounts->add(account5.get());
+    tableAccounts.add(account5.get());
 
     while(true) {
         //loading();
@@ -616,11 +635,11 @@ int main() {
         switch (answer){
         case 0:
             // On passe l'attribut p_activeThread de RecurrentOperation à false pour stopper tous les threads
-            for (size_t i = 0; i < tableAccounts->size(); i++)
+            for (size_t i = 0; i < tableAccounts.size(); i++)
             {
-                if (tableAccounts[i].getRecurrentOperations()->size() > 0)
+                if (accountsList[i]->getRecurrentOperations()->size() > 0)
                 {
-                    tableAccounts[i]->getRecurrentOperations()->at(0).setActiveThread(false);
+                    accountsList[i]->getRecurrentOperations()->at(0).setActiveThread(false);
                     break;
                 }
             }

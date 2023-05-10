@@ -5,7 +5,7 @@
 # Compiler settings - Can be customized.
 CC = g++
 CXXFLAGS = -std=c++20 -Wall
-LDFLAGS = -L ./src/lib -I ./src/include -l Operation -l Personne
+LDFLAGS = -L ./src/lib -I ./src/include -l Operation -l Personne -l sqlite3
 
 # Makefile settings - Can be customized.
 APPNAME = Banque

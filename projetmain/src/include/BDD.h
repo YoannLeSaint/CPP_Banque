@@ -3,16 +3,25 @@
 #include <vector>
 #include <Personne.h>
 #include <Operation.h>
-//#include <sqlite3>
+#include <sstream>
+
+#ifdef _WIN32
+#include <winsqlite/winsqlite3.h>
+#else
+#include <sqlite3.h>
+#endif
 
 #include "Compte.h"
+#include "CompteEnLigne.h"
+#include "CompteEpargne.h"
+#include "CompteStandard.h"
 
 using namespace std;
 
 template <class T>
 class BDD {
 private:
-    //sqlite3* p_db;
+    sqlite3* p_db;
     string p_name;
     vector<string> p_column;
 
@@ -28,8 +37,8 @@ public:
     ~BDD() = default;
 
     string getName();
-    int getColumns();
-    //sqlite3* getDb();
+    vector<string> getColumns();
+    sqlite3* getDb();
 
     void display();
     void add(T *temp);
@@ -39,5 +48,6 @@ public:
 
 };
 
-
-
+#ifndef _WIN32
+#include "../BDD.inl"
+#endif
