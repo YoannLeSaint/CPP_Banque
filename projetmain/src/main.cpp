@@ -618,7 +618,7 @@ int main() {
             // On passe l'attribut p_activeThread de RecurrentOperation à false pour stopper tous les threads
             for (size_t i = 0; i < tableAccounts->size(); i++)
             {
-                if (tableAccounts[i]->getRecurrentOperations()->size() > 0)
+                if (tableAccounts[i].getRecurrentOperations()->size() > 0)
                 {
                     tableAccounts[i]->getRecurrentOperations()->at(0).setActiveThread(false);
                     break;
