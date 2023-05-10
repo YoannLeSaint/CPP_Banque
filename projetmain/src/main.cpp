@@ -39,6 +39,7 @@ void displayAccount(vector<unique_ptr<Compte>> *acc){
             cout << "+ " << i+1 << " " << acc->at(i).get()->toString() << endl;
         }
     }
+
     this_thread::sleep_for(5s);
 }
 
@@ -57,15 +58,12 @@ void add(vector<unique_ptr<Personne>> *clientsList,
         switch (anwserADD){
         case 'a':
             {
-            // Personne *pClient = new Personne(0);
             unique_ptr<Personne> pClient = make_unique<Personne>(0);
-            //clientsList->push_back(pClient);
             clientsList->push_back(move(pClient));
             return;
             }
         case 'b':
             {
-            //Personne* pAdviser = new Personne(0);
             unique_ptr<Personne> pAdviser = make_unique<Personne>(0);
             advisorsList->push_back(move(pAdviser));
             return;
@@ -516,8 +514,53 @@ int main() {
     vector<unique_ptr<Compte>> accountsList;
     vector<thread> threadsList;
 
+    string rqt_create;
     int answer(0);
     bool start = true;
+
+    // Création de la table des clients
+    rqt_create = "CREATE TABLE IF NOT EXISTS Client"    \
+                 "ID          INTEGER  PRIMARY KEY,"    \
+                 "FirstName   TEXT     NOT NULL,"       \
+                 "LastName    TEXT     NOT NULL,"       \
+                 "Address     TEXT     NOT NULL);";
+    vector<string> col1{"FirstName", "LastName", "Address"};
+    BDD<Personne>* tableClients = new BDD<Personne>("Client", rqt_create, col1);
+
+    // Création de la table des conseillers
+    rqt_create = "CREATE TABLE IF NOT EXISTS Advisor"   \
+                 "ID          INTEGER  PRIMARY KEY,"    \
+                 "FirstName   TEXT     NOT NULL,"       \
+                 "LastName    TEXT     NOT NULL,"       \
+                 "Address     TEXT     NOT NULL);";
+    BDD<Personne>* tableAdvisors = new BDD<Personne>("Advisor", rqt_create, col1);
+
+    // Création de la table des comptes
+    rqt_create = "CREATE TABLE IF NOT EXISTS Account"   \
+                 "ID          INTEGER  PRIMARY KEY,"    \
+                 "Type        INTEGER  NOT NULL,"       \
+                 "HolderId    INTEGER  NOT NULL,"       \
+                 "AdvisorId   INTEGER  NOT NULL,"       \
+                 "Balance     FLOAT    NOT NULL,"       \
+                 "Interest    FLOAT);";
+
+    vector<string> col2{"Type", "HolderId", "AdvisorId", "Balance", "Interest"};
+    BDD<Compte>* tableAccounts = new BDD<Compte>("Account", rqt_create, col2);
+
+    //Création de la table des opérations
+    rqt_create = "CREATE TABLE IF NOT EXISTS Operation" \
+                 "ID          INTEGER  PRIMARY KEY,"    \
+                 "AccountId   INTEGER  NOT NULL,"       \
+                 "Date        TEXT     NOT NULL,"       \
+                 "Name        TEXT     NOT NULL,"       \
+                 "Sum         FLOAT    NOT NULL,"       \
+                 "Reccurrence INTEGER,"                 \
+                 "Active      BOOLEAN,"                 \
+                 "Count       INTEGER);";
+
+    vector<string> col3{"AccountId", "Date", "Name", "Sum", "Reccurrence", "Active", "Count"};
+    BDD<Operation>* tableOperations = new BDD<Operation>("Operation", rqt_create, col3);
+
 
     // On crée des personnes pour préremplir le programme
     unique_ptr<Personne> p1 = make_unique<Personne>("Jean", "Todt", "ici");
@@ -526,28 +569,30 @@ int main() {
     unique_ptr<Personne> p4 = make_unique<Personne>("Yoann", "Le Saint", "Nantes DC");
     unique_ptr<Personne> p5 = make_unique<Personne>("Charlotte", "Todt", "NY");
 
-    clientsList.push_back(move(p1));
-    clientsList.push_back(move(p2));
-    clientsList.push_back(move(p3));
+    tableClients->add(p1.get());
+    tableClients->add(p2.get());
+    tableClients->add(p3.get());
+    tableClients->add(p4.get());
+    tableClients->add(p5.get());
 
-    advisorsList.push_back(move(p4));
-    advisorsList.push_back(move(p5));
+    tableAdvisors->add(p4.get());
+    tableAdvisors->add(p5.get());
 
     // On crée des comptes pour préremplir le programme
     unique_ptr<Compte> account1 = make_unique<CompteEnLigne>(clientsList.at(0).get(), advisorsList.at(1).get(), 500.f);
-    accountsList.push_back(move(account1));
-
+    tableAccounts->add(account1.get());
+    
     unique_ptr<Compte> account2 = make_unique<CompteEpargne>(clientsList.at(0).get(), advisorsList.at(1).get(), 3450.f, 3);
-    accountsList.push_back(move(account2));
+    tableAccounts->add(account2.get());
 
     unique_ptr<Compte> account3 = make_unique<CompteStandard>(clientsList.at(1).get(), advisorsList.at(0).get(), 500.f);
-    accountsList.push_back(move(account3));
+    tableAccounts->add(account3.get());
 
     unique_ptr<Compte> account4 = make_unique<CompteStandard>(clientsList.at(2).get(), advisorsList.at(0).get(), 10.f);
-    accountsList.push_back(move(account4));
+    tableAccounts->add(account4.get());
 
     unique_ptr<Compte> account5 = make_unique<CompteStandard>(clientsList.at(2).get(), advisorsList.at(0).get(), 10000.f);
-    accountsList.push_back(move(account5));
+    tableAccounts->add(account5.get());
 
     while(true) {
         //loading();
@@ -571,11 +616,11 @@ int main() {
         switch (answer){
         case 0:
             // On passe l'attribut p_activeThread de RecurrentOperation à false pour stopper tous les threads
-            for (size_t i = 0; i < accountsList.size(); i++)
+            for (size_t i = 0; i < tableAccounts->size(); i++)
             {
-                if (accountsList.at(i).get()->getRecurrentOperations()->size()>0)
+                if (tableAccounts[i]->getRecurrentOperations()->size() > 0)
                 {
-                    accountsList.at(i).get()->getRecurrentOperations()->at(0).setActiveThread(false);
+                    tableAccounts[i]->getRecurrentOperations()->at(0).setActiveThread(false);
                     break;
                 }
             }
@@ -607,7 +652,7 @@ int main() {
             break;
         default:
             cout << "Not a defined option. Please try again." << endl;
-            this_thread::sleep_for(3s);
+            //this_thread::sleep_for(3s);
             break;
         }
     }
