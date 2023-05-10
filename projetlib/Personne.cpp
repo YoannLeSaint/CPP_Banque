@@ -1,5 +1,4 @@
-#include "./include/Personne.h"
-
+#include "Personne.h"
 
 Personne::Personne(string firstname, string lastname, string adress){
     this->p_firstname = firstname;

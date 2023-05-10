@@ -1,4 +1,4 @@
-#include "./include/Operation.h"
+#include "Operation.h"
 
 Operation::Operation(string date, string name, float sum){
     this->p_date = date;

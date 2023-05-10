@@ -7,9 +7,9 @@ CompteEpargne::CompteEpargne(Personne* holder, Personne* advisor, float amount, 
 string CompteEpargne::toString(){
     stringstream ss;
     if (getBalance() > 0){
-        ss << getHolder().toString() << " (Compte Epargne) | +" << getBalance() << "EUR" << endl;
+        ss << getHolder()->toString() << " (Compte Epargne) | +" << getBalance() << "EUR" << endl;
     } else {
-        ss << getHolder().toString() << " (Compte Epargne) | " << getBalance() << "EUR" << endl;
+        ss << getHolder()->toString() << " (Compte Epargne) | " << getBalance() << "EUR" << endl;
     }
     return ss.str();
 }

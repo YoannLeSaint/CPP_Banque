@@ -5,8 +5,8 @@
 #include <string>
 #include <sstream>
 #include <chrono>
-
-#include "Operation.h"
+#include <Personne.h>
+#include <Operation.h>
 
 using namespace std;
 

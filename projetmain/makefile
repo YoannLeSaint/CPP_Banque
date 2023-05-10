@@ -5,7 +5,7 @@
 # Compiler settings - Can be customized.
 CC = g++
 CXXFLAGS = -std=c++20 -Wall
-LDFLAGS = 
+LDFLAGS = -L ./src/lib -I ./src/include -l Operation -l Personne
 
 # Makefile settings - Can be customized.
 APPNAME = Banque
@@ -44,7 +44,7 @@ $(APPNAME): $(OBJ)
 
 # Building rule for .o files and its .c/.cpp in combination with all .h
 $(OBJDIR)/%.o: $(SRCDIR)/%$(EXT)
-	$(CC) $(CXXFLAGS) -o $@ -c $<
+	$(CC) $(CXXFLAGS) -o $@ -c $< -L ./src/lib -I ./src/include -l Operation -l Personne
 
 ################### Cleaning rules for Unix-based OS ###################
 # Cleans complete project

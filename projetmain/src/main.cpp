@@ -4,39 +4,17 @@
 #include <vector>
 #include <algorithm>
 #include <typeinfo>
-#include <thread> 
 #include <mutex>
+#include <Personne.h>
+#include <Operation.h>
 
 #include "./include/Compte.h"
 #include "./include/CompteEnLigne.h"
 #include "./include/CompteEpargne.h"
 #include "./include/CompteStandard.h"
-#include "./include/Operation.h"
-#include "./include/Personne.h"
+#include "./include/BDD.h"
 
 using namespace std;
-
-
-// void loading(){
-//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-//     cout << "Loading" << endl;
-//     this_thread::sleep_for(1000ms);
-//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-//     cout << "Loading ." << endl;
-//     this_thread::sleep_for(1000ms);
-//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-//     cout << "Loading . ." << endl;
-//     this_thread::sleep_for(1000ms);
-//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-//     cout << "Loading . . ." << endl;
-//     this_thread::sleep_for(1000ms);
-//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-//     cout << endl << endl << endl << endl << endl << endl << endl << endl << endl << endl;
-// }
 
 int displayVector(vector<unique_ptr<Personne>> *vect, string nameVect){
     int index = 0;
@@ -211,7 +189,7 @@ void del(vector<unique_ptr<Personne>>* clientsList,
 
                     for (long int i = accountsList->size() - 1; i >= 0; i--)
                     {
-                        if (accountsList->at(i).get()->getHolder().toString() == clientsList->at(x).get()->toString())
+                        if (accountsList->at(i).get()->getHolder()->toString() == clientsList->at(x).get()->toString())
                         {
                             accountsList->erase(accountsList->begin()+i);
                         }
@@ -236,7 +214,7 @@ void del(vector<unique_ptr<Personne>>* clientsList,
                     for (long unsigned int i = 0; i < accountsList->size(); i++)
                     {
                         int adv = 0;
-                        if (accountsList->at(i).get()->getAdvisor().toString() == advisorsList->at(x).get()->toString()){
+                        if (accountsList->at(i).get()->getAdvisor()->toString() == advisorsList->at(x).get()->toString()){
                             cout << "Please select a new advisor for the following account : " << endl;
                             cout << accountsList->at(i).get()->toString() << endl;
 
@@ -302,8 +280,8 @@ int choiceByHolder(vector<unique_ptr<Compte>>* accountsList,
 
         for (long unsigned int i = 0; i < accountsList->size(); i++)
         {
-            if (accountsList->at(i).get()->getHolder().getFirstname() == clientsList->at(personChoice).get()->getFirstname()
-            && accountsList->at(i).get()->getHolder().getLastname() == clientsList->at(personChoice).get()->getLastname())
+            if (accountsList->at(i).get()->getHolder()->getFirstname() == clientsList->at(personChoice).get()->getFirstname()
+            && accountsList->at(i).get()->getHolder()->getLastname() == clientsList->at(personChoice).get()->getLastname())
             {
                 cout << i << ") " << accountsList->at(i).get()->toString() << endl;
             }
@@ -338,8 +316,8 @@ int choiceByAdvisor(vector<unique_ptr<Compte>>* accountsList,
 
         for (long unsigned int i = 0; i < accountsList->size(); i++)
         {
-            if (accountsList->at(i).get()->getAdvisor().getFirstname() == advisorsList->at(personChoice).get()->getFirstname()
-            && accountsList->at(i).get()->getAdvisor().getLastname() == advisorsList->at(personChoice).get()->getLastname())
+            if (accountsList->at(i).get()->getAdvisor()->getFirstname() == advisorsList->at(personChoice).get()->getFirstname()
+            && accountsList->at(i).get()->getAdvisor()->getLastname() == advisorsList->at(personChoice).get()->getLastname())
             {
                 cout << i << ") " << accountsList->at(i).get()->toString() << endl;
             }
@@ -355,7 +333,7 @@ void interaction(Compte* account, vector<thread>* threadsList)
 {
     int userChoice = 0;
     float amount = 0.;
-    vector<Operation> listOpe;
+    vector<Operation*> listOpe;
     int opeChoice = 0;
 
     while(true)
@@ -405,9 +383,9 @@ void interaction(Compte* account, vector<thread>* threadsList)
         case 4: // Consult operations
             listOpe = account->consultOperations();
 
-            for (Operation ope : listOpe)
+            for (Operation* ope : listOpe)
             {
-                cout << "\t* " << ope.toString() << endl;
+                cout << "\t* " << ope->toString() << endl;
             }
             this_thread::sleep_for(3s);
             break;
@@ -415,9 +393,9 @@ void interaction(Compte* account, vector<thread>* threadsList)
         case 5: // Consult debits
             listOpe = account->consultDebit();
 
-            for (Operation ope : listOpe)
+            for (Operation* ope : listOpe)
             {
-                cout << "\t* " << ope.toString() << endl;
+                cout << "\t* " << ope->toString() << endl;
             }
             this_thread::sleep_for(3s);
             break;
@@ -425,9 +403,9 @@ void interaction(Compte* account, vector<thread>* threadsList)
         case 6: // Consults credits
             listOpe = account->consultCredit();
 
-            for (Operation ope : listOpe)
+            for (Operation* ope : listOpe)
             {
-                cout << "\t* " << ope.toString() << endl;
+                cout << "\t* " << ope->toString() << endl;
             }
             this_thread::sleep_for(3s);
             break;

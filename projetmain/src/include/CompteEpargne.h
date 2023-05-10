@@ -2,9 +2,9 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <Personne.h>
+#include <Operation.h>
 #include "Compte.h"
-#include "Personne.h"
-#include "Operation.h"
 
 using namespace std;
 

@@ -3,8 +3,8 @@
 
 // Constructeurs
 Compte::Compte(Personne* holder, Personne* advisor, float amount) {
-    this->p_holder = *holder;
-    this->p_advisor = *advisor;
+    this->p_holder = holder;
+    this->p_advisor = advisor;
     this->p_balance = amount;
 }
 
@@ -20,28 +20,28 @@ float Compte::ConsultBalance() {
     return this->p_balance;
 }
 
-vector<Operation> Compte::consultOperations() {
+vector<Operation*> Compte::consultOperations() {
     return this->p_historic;
 }
 
-vector<Operation> Compte::consultDebit() {
-    vector<Operation> res;
+vector<Operation*> Compte::consultDebit() {
+    vector<Operation*> res;
 
-    for (Operation ope : this->p_historic)
+    for (Operation* ope : this->p_historic)
     {
-        if (ope.getSum() < 0)
+        if (ope->getSum() < 0)
             res.push_back(ope);
     }
 
     return res;
 }
 
-vector<Operation> Compte::consultCredit() {
-    vector<Operation> res;
+vector<Operation*> Compte::consultCredit() {
+    vector<Operation*> res;
 
-    for (Operation ope : this->p_historic)
+    for (Operation* ope : this->p_historic)
     {
-        if (ope.getSum() > 0)
+        if (ope->getSum() > 0)
             res.push_back(ope);
     }
 
@@ -58,7 +58,7 @@ void Compte::addMovement(float sum)
     date << " " << localtime(&now)->tm_hour << ":" << localtime(&now)->tm_min << ":" << localtime(&now)->tm_sec;
     Operation* ope = new Operation(date.str(), name.str(), sum);
 
-    this->p_historic.push_back(*ope);
+    this->p_historic.push_back(ope);
 }
 
 void Compte::executeRecurrence(RecurrentOperation* ope)
@@ -79,15 +79,15 @@ void Compte::addRecurrentOperation()
 }
 
 // Getters
-Personne Compte::getHolder() {
+Personne* Compte::getHolder() {
     return this->p_holder;
 }
 
-Personne Compte::getAdvisor() {
+Personne* Compte::getAdvisor() {
     return this->p_advisor;
 }
 
-vector<Operation> Compte::getHistoric() {
+vector<Operation*> Compte::getHistoric() {
     return this->p_historic;
 }
 
@@ -102,14 +102,14 @@ vector<RecurrentOperation>* Compte::getRecurrentOperations()
 
 // Setters
 void Compte::setHolder(Personne* holder) {
-    this->p_holder = *holder;
+    this->p_holder = holder;
 }
 
 void Compte::setAdvisor(Personne* advisor) {
-    this->p_advisor = *advisor;
+    this->p_advisor = advisor;
 }
 
-void Compte::setHistoric(vector<Operation> historic) {
+void Compte::setHistoric(vector<Operation*> historic) {
     this->p_historic = historic;
 }
 
