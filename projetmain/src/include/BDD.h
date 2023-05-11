@@ -28,24 +28,21 @@ private:
     BDD() = default;
 
     void setName(string name);
-    void setColumn(vector<string> column);
     int callback_function(void *inutil, int argc, char** argv, char** columns);
 
 public:
-    BDD(string name, string rqt_create, vector<string> column);
+    BDD(string name, string rqt_create);
 
     ~BDD() = default;
 
     string getName();
-    vector<string> getColumns();
     sqlite3* getDb();
 
     void display();
-    void add(T *temp);
+    void add(string temp, string column);
+    void del(int id);
+    int lastId();
     int size();
-
-    T operator[](int i);
-
 };
 
 #ifndef _WIN32

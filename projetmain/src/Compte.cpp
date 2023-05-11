@@ -2,10 +2,11 @@
 
 
 // Constructeurs
-Compte::Compte(Personne* holder, Personne* advisor, float amount) {
+Compte::Compte(Personne* holder, Personne* advisor, float amount, int id) {
     this->p_holder = holder;
     this->p_advisor = advisor;
     this->p_balance = amount;
+    this->p_id = id;
 }
 
 void Compte::deposit(float amount) {
@@ -100,6 +101,10 @@ vector<RecurrentOperation>* Compte::getRecurrentOperations()
     return &this->p_recurrentOperations;
 }
 
+int Compte::getId(){
+    return this->p_id;
+}
+
 // Setters
 void Compte::setHolder(Personne* holder) {
     this->p_holder = holder;
@@ -120,4 +125,8 @@ void Compte::setBalance(float balance) {
 void Compte::setRecurrentOperations(vector<RecurrentOperation> recurrentOperations)
 {
     this->p_recurrentOperations = recurrentOperations;
+}
+
+void Compte::setId(int id){
+    this->p_id = id;
 }

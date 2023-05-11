@@ -15,7 +15,9 @@ private:
 
 public:
     CompteEpargne() = default;
-    CompteEpargne(Personne* holder, Personne* advisor, float amount, float interest);
+    CompteEpargne(Personne* holder, Personne* advisor, float amount, float interest, int id);
     ~CompteEpargne() = default;
     string toString();
+    string getValues();
+    string columns();
 };

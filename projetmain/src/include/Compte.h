@@ -18,11 +18,12 @@ private:
     vector<Operation*> p_historic;
     vector<RecurrentOperation> p_recurrentOperations;
     float p_balance;
+    int p_id;
 
 protected:
     // Constructeurs
     Compte() = default;
-    Compte(Personne* holder, Personne* advisor, float amount);
+    Compte(Personne* holder, Personne* advisor, float amount, int id);
 
     // Getters
     vector<Operation*> getHistoric();
@@ -33,6 +34,7 @@ protected:
     void setHistoric(vector<Operation*> historic);
     void setBalance(float balance);
     void setRecurrentOperations(vector<RecurrentOperation> recurrentOperations);
+    void setId(int id);
 
 public:
     // Destructeur
@@ -42,6 +44,7 @@ public:
     Personne* getHolder();
     Personne* getAdvisor();
     vector<RecurrentOperation>* getRecurrentOperations();
+    int getId();
 
     // Setters
     void setAdvisor(Personne* advisor);
@@ -55,6 +58,8 @@ public:
     vector<Operation*> consultCredit();
     void addMovement(float sum);
     virtual string toString() = 0;
+    virtual string getValues() = 0;
+    virtual string columns() = 0;
     void executeRecurrence(RecurrentOperation* ope);
     void addRecurrentOperation();
 };
