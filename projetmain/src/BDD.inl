@@ -86,6 +86,30 @@ void BDD<T>::del(int id){
     sqlite3_close(getDb());
 }
 
+template <class T>
+void BDD<T>::updateId(string col, int newId, int oldId){
+    char* errorMsg = 0;
+    stringstream ss;
+    int rc = 0;
+    string rqt_create;
+
+    rc = sqlite3_open("BDD.db", &p_db);
+
+    if (rc != SQLITE_OK)
+        cerr << "BDD.db could not be opened : " << errorMsg << endl;
+
+    ss << "UPDATE " << getName() << " SET " << col << " = " << newId << " WHERE " << col << " = " << oldId;
+
+    rqt_create = ss.str();
+
+    rc = sqlite3_exec(getDb(), rqt_create.c_str(), 0, 0, &errorMsg);
+
+    if (rc != SQLITE_OK)
+        cerr << "Could not update table : " << errorMsg << endl;
+
+    sqlite3_close(getDb());
+}
+
 
 template <class T>
 int BDD<T>::size() {
@@ -96,14 +120,14 @@ int BDD<T>::size() {
     return sqlite3_exec(getDb(), ss.str().c_str(), 0, 0, 0);
 }
 
-template <class T>
-int BDD<T>::lastId() {
-    vector<string> col;
-    stringstream ss;
-    ss << "SELECT ID FROM " << getName() << "ORDER BY ID DESC LIMIT 1;";
+// template <class T>
+// int BDD<T>::lastId() {
+//     vector<string> col;
+//     stringstream ss;
+//     ss << "SELECT ID FROM " << getName() << "ORDER BY ID DESC LIMIT 1;";
 
-    return sqlite3_exec(getDb(), ss.str().c_str(), 0, 0, 0);
-}
+//     return sqlite3_exec(getDb(), ss.str().c_str(), 0, 0, 0);
+// }
 
 // Getters
 template <class T>

@@ -41,7 +41,8 @@ public:
     void display();
     void add(string temp, string column);
     void del(int id);
-    int lastId();
+    void updateId(string col, int newId, int oldId);
+    //int lastId();
     int size();
 };
 

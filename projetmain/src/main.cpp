@@ -27,6 +27,11 @@ void suppBDD(BDD<T> *tableName, int id){
     tableName->del(id);
 }
 
+template<class T>
+void upBDD(BDD<T> *tableName, string col, int newId, int oldId){
+    tableName->updateId(col, newId, oldId);
+}
+
 
 int displayVector(vector<unique_ptr<Personne>> *vect, string nameVect){
     int index = 0;
@@ -251,6 +256,7 @@ void del(vector<unique_ptr<Personne>>* clientsList,
                             }
                             cout << endl << "> ";
                             cin >> adv;
+                            upBDD(tableAccounts, "AdvisorId", advisorsList->at(adv)->getIdAdvisor(), advisorsList->at(i)->getIdAdvisor());
                             accountsList->at(i).get()->setAdvisor(advisorsList->at(adv).get());
                         }
                     }
