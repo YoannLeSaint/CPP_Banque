@@ -532,57 +532,19 @@ void initBDD(vector<unique_ptr<Personne>>* clientsList, vector<unique_ptr<Person
                vector<unique_ptr<Compte>>* accountsList, BDD<Personne> *tableClients, BDD<Personne> *tableAdvisors, BDD<Compte> *tableAccounts,
                int *idClients, int *idAdvisors, int *idAccounts)
 {
-    // On crée des personnes pour préremplir le programme
-    unique_ptr<Personne> p1 = make_unique<Personne>("Jean", "Todt", "ici", *idClients, 0);
-    *idClients+=1;
-    unique_ptr<Personne> p2 = make_unique<Personne>("Jean", "Todd", "la bas", *idClients, 0);
-    *idClients+=1;
-    unique_ptr<Personne> p3 = make_unique<Personne>("Marc", "Todt", "chez lui", *idClients, 0);
-    *idClients+=1;
+    // On ajoute à la BDD nos clients, conseillers, comptes
+    addBDD(tableClients, clientsList->at(0)->getValuesClient(), clientsList->at(0)->columns());
+    addBDD(tableClients, clientsList->at(1)->getValuesClient(), clientsList->at(1)->columns());
+    addBDD(tableClients, clientsList->at(2)->getValuesClient(), clientsList->at(2)->columns());
 
-    unique_ptr<Personne> p4 = make_unique<Personne>("Yoann", "Le Saint", "Nantes DC", 0, *idAdvisors);
-    *idAdvisors+=1;
-    unique_ptr<Personne> p5 = make_unique<Personne>("Charlotte", "Todt", "NY", 0, *idAdvisors);
-    *idAdvisors+=1;
+    addBDD(tableAdvisors, advisorsList->at(0)->getValuesAdvisor(), advisorsList->at(0)->columns());
+    addBDD(tableAdvisors, advisorsList->at(1)->getValuesAdvisor(), advisorsList->at(1)->columns());
 
-    addBDD(tableClients, p1->getValuesClient(), p1->columns());
-    clientsList->push_back(move(p1));
-    addBDD(tableClients, p2->getValuesClient(), p2->columns());
-    clientsList->push_back(move(p2));
-    addBDD(tableClients, p3->getValuesClient(), p3->columns());
-    clientsList->push_back(move(p3));
-
-    addBDD(tableAdvisors, p4->getValuesAdvisor(), p4->columns());
-    addBDD(tableAdvisors, p5->getValuesAdvisor(), p5->columns());
-
-    advisorsList->push_back(move(p4));
-    advisorsList->push_back(move(p5));
-
-    // On crée des comptes pour préremplir le programme
-    unique_ptr<Compte> account1 = make_unique<CompteEnLigne>(clientsList->at(0).get(), advisorsList->at(1).get(), 500.f, *idAccounts);
-    *idAccounts+=1;
-    addBDD(tableAccounts, account1->getValues(), account1->columns());
-    accountsList->push_back(move(account1));
-
-    unique_ptr<Compte> account2 = make_unique<CompteEpargne>(clientsList->at(0).get(), advisorsList->at(1).get(), 3450.f, 3, *idAccounts);
-    *idAccounts+=1;
-    addBDD(tableAccounts, account2->getValues(), account2->columns());
-    accountsList->push_back(move(account2));
-
-    unique_ptr<Compte> account3 = make_unique<CompteStandard>(clientsList->at(1).get(), advisorsList->at(0).get(), 500.f, *idAccounts);
-    *idAccounts+=1;
-    addBDD(tableAccounts, account3->getValues(), account3->columns());
-    accountsList->push_back(move(account3));
-
-    unique_ptr<Compte> account4 = make_unique<CompteStandard>(clientsList->at(2).get(), advisorsList->at(0).get(), 10.f, *idAccounts);
-    *idAccounts+=1;
-    addBDD(tableAccounts, account4->getValues(), account4->columns());
-    accountsList->push_back(move(account4));
-
-    unique_ptr<Compte> account5 = make_unique<CompteStandard>(clientsList->at(2).get(), advisorsList->at(0).get(), 10000.f, *idAccounts);
-    *idAccounts+=1;
-    addBDD(tableAccounts, account5->getValues(), account5->columns());
-    accountsList->push_back(move(account5));
+    addBDD(tableAccounts, accountsList->at(0)->getValues(), accountsList->at(0)->columns());
+    addBDD(tableAccounts, accountsList->at(1)->getValues(), accountsList->at(1)->columns());
+    addBDD(tableAccounts, accountsList->at(2)->getValues(), accountsList->at(2)->columns());
+    addBDD(tableAccounts, accountsList->at(3)->getValues(), accountsList->at(3)->columns());
+    addBDD(tableAccounts, accountsList->at(4)->getValues(), accountsList->at(4)->columns());
 
 }
 
@@ -628,8 +590,45 @@ int main() {
     int answer(0);
     bool start = true;
 
-    // idAccounts = tableAccounts->lastId() + 1;
-    // cout << idAccounts << endl;
+    //Création de nos premiers clients
+    unique_ptr<Personne> p1 = make_unique<Personne>("Jean", "Todt", "ici", idClients, 0);
+    clientsList.push_back(move(p1));
+    idClients+=1;
+    unique_ptr<Personne> p2 = make_unique<Personne>("Jean", "Todd", "la bas", idClients, 0);
+    clientsList.push_back(move(p2));
+    idClients+=1;
+    unique_ptr<Personne> p3 = make_unique<Personne>("Marc", "Todt", "chez lui", idClients, 0);
+    clientsList.push_back(move(p3));
+    idClients+=1;
+
+    //Création de nos premiers conseillers
+    unique_ptr<Personne> p4 = make_unique<Personne>("Yoann", "Le Saint", "Nantes DC", 0, idAdvisors);
+    idAdvisors+=1;
+    unique_ptr<Personne> p5 = make_unique<Personne>("Charlotte", "Todt", "NY", 0, idAdvisors);
+    idAdvisors+=1;
+    advisorsList.push_back(move(p4));
+    advisorsList.push_back(move(p5));
+
+    //Création de nos premiers comptes
+    unique_ptr<Compte> account1 = make_unique<CompteEnLigne>(clientsList.at(0).get(), advisorsList.at(1).get(), 500.f, idAccounts);
+    idAccounts+=1;
+    unique_ptr<Compte> account2 = make_unique<CompteEpargne>(clientsList.at(0).get(), advisorsList.at(1).get(), 3450.f, 3, idAccounts);
+    idAccounts+=1;
+    unique_ptr<Compte> account3 = make_unique<CompteStandard>(clientsList.at(1).get(), advisorsList.at(0).get(), 500.f, idAccounts);
+    idAccounts+=1;
+    unique_ptr<Compte> account4 = make_unique<CompteStandard>(clientsList.at(2).get(), advisorsList.at(0).get(), 10.f, idAccounts);
+    idAccounts+=1;
+    unique_ptr<Compte> account5 = make_unique<CompteStandard>(clientsList.at(2).get(), advisorsList.at(0).get(), 10000.f, idAccounts);
+    idAccounts+=1;
+
+    accountsList.push_back(move(account1));
+    accountsList.push_back(move(account2));
+    accountsList.push_back(move(account3));
+    accountsList.push_back(move(account4));
+    accountsList.push_back(move(account5));
+
+    //idAccounts = tableAccounts->lastId() + 1;
+    //cout << idAccounts << endl;
 
     while(true) {
 

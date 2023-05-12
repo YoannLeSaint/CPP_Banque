@@ -12,14 +12,7 @@ BDD<T>::BDD(string name, string rqt_create) {
 
     if (rc != SQLITE_OK)
         cerr << "BDD.db could not be opened : " << errorMsg << endl;
-    else
-        cout << "BDD.db opened." << endl;
 
-    // arg1 = database
-    // arg2 = requête à exécuter
-    // arg3 = Fonction à appeler après l'exécution (0 pour pas d'appel)
-    // arg4 = premier argument de la fonction, doit être à 0
-    // arg5 = Variable qui stocke le message d'erreur (en cas d'erreur)
     rc = sqlite3_exec(getDb(), rqt_create.c_str(), 0, 0, &errorMsg);
 
     if (rc != SQLITE_OK)
