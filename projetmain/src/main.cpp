@@ -538,20 +538,86 @@ void initBDD(vector<unique_ptr<Personne>>* clientsList, vector<unique_ptr<Person
                vector<unique_ptr<Compte>>* accountsList, BDD<Personne> *tableClients, BDD<Personne> *tableAdvisors, BDD<Compte> *tableAccounts,
                int *idClients, int *idAdvisors, int *idAccounts)
 {
-    // On ajoute à la BDD nos clients, conseillers, comptes
-    addBDD(tableClients, clientsList->at(0)->getValuesClient(), clientsList->at(0)->columns());
-    addBDD(tableClients, clientsList->at(1)->getValuesClient(), clientsList->at(1)->columns());
-    addBDD(tableClients, clientsList->at(2)->getValuesClient(), clientsList->at(2)->columns());
+    // On lit la table des clients
+    // Si elle est vide, on l'initialise avec des valeurs par défaut
+    if (tableClients->size() > 0)
+    {
+        *clientsList = tableClients->getAll(clientsList, advisorsList, BDD<Personne>::tagPersonne());
+    }
+    else
+    {
+        unique_ptr<Personne> p1 = make_unique<Personne>("Jean", "Todt", "ici", *idClients, 0);
+        clientsList->push_back(move(p1));
+        //idClients+=1;
+        unique_ptr<Personne> p2 = make_unique<Personne>("Jean", "Todd", "la bas", *idClients, 0);
+        clientsList->push_back(move(p2));
+        //idClients+=1;
+        unique_ptr<Personne> p3 = make_unique<Personne>("Marc", "Todt", "chez lui", *idClients, 0);
+        clientsList->push_back(move(p3));
+        //idClients+=1;
 
-    addBDD(tableAdvisors, advisorsList->at(0)->getValuesAdvisor(), advisorsList->at(0)->columns());
-    addBDD(tableAdvisors, advisorsList->at(1)->getValuesAdvisor(), advisorsList->at(1)->columns());
+        for (size_t i = 0; i < clientsList->size(); i++)
+        {
+            addBDD(tableClients, clientsList->at(i)->getValuesClient(), clientsList->at(i)->columns());
+        }
+    }
 
-    addBDD(tableAccounts, accountsList->at(0)->getValues(), accountsList->at(0)->columns());
-    addBDD(tableAccounts, accountsList->at(1)->getValues(), accountsList->at(1)->columns());
-    addBDD(tableAccounts, accountsList->at(2)->getValues(), accountsList->at(2)->columns());
-    addBDD(tableAccounts, accountsList->at(3)->getValues(), accountsList->at(3)->columns());
-    addBDD(tableAccounts, accountsList->at(4)->getValues(), accountsList->at(4)->columns());
+    *idClients = tableClients->size();
 
+    // On lit la table des conseillers
+    // Si elle est vide, on l'initialise avec des valeurs par défaut
+    if (tableAdvisors->size() > 0)
+    {
+        *advisorsList = tableAdvisors->getAll(clientsList, advisorsList, BDD<Personne>::tagPersonne());
+    }
+    else
+    {
+        unique_ptr<Personne> p4 = make_unique<Personne>("Yoann", "Le Saint", "Nantes DC", 0, *idAdvisors);
+        advisorsList->push_back(move(p4));
+        //idAdvisors+=1;
+        unique_ptr<Personne> p5 = make_unique<Personne>("Charlotte", "Todt", "NY", 0, *idAdvisors);
+        advisorsList->push_back(move(p5));
+        //idAdvisors+=1;
+
+        for (size_t i = 0; i < advisorsList->size(); i++)
+        {
+            addBDD(tableAdvisors, advisorsList->at(i)->getValuesAdvisor(), advisorsList->at(i)->columns());
+        }
+    }
+
+    *idAdvisors = tableAdvisors->size();
+
+    // On lit la table des comptes
+    // Si elle est vide, on l'initialise avec des valeurs par défaut
+    if (tableAccounts->size() > 0)
+    {
+        *accountsList = tableAccounts->getAll(clientsList, advisorsList, BDD<Compte>::tagCompte());
+    }
+    else
+    {
+        unique_ptr<Compte> account1 = make_unique<CompteEnLigne>(clientsList->at(0).get(), advisorsList->at(1).get(), 500.f, *idAccounts);
+        accountsList->push_back(move(account1));
+        //idAccounts+=1;
+        unique_ptr<Compte> account2 = make_unique<CompteEpargne>(clientsList->at(0).get(), advisorsList->at(1).get(), 3450.f, 3, *idAccounts);
+        accountsList->push_back(move(account2));
+        //idAccounts+=1;
+        unique_ptr<Compte> account3 = make_unique<CompteStandard>(clientsList->at(1).get(), advisorsList->at(0).get(), 500.f, *idAccounts);
+        accountsList->push_back(move(account3));
+        //idAccounts+=1;
+        unique_ptr<Compte> account4 = make_unique<CompteStandard>(clientsList->at(2).get(), advisorsList->at(0).get(), 10.f, *idAccounts);
+        accountsList->push_back(move(account4));
+        //idAccounts+=1;
+        unique_ptr<Compte> account5 = make_unique<CompteStandard>(clientsList->at(2).get(), advisorsList->at(0).get(), 10000.f, *idAccounts);
+        accountsList->push_back(move(account5));
+        //idAccounts+=1;
+
+        for (size_t i = 0; i < accountsList->size(); i++)
+        {
+            addBDD(tableAccounts, accountsList->at(i)->getValues(), accountsList->at(i)->columns());
+        }
+    }
+
+    *idAccounts = tableAccounts->size();
 }
 
 int main() {
@@ -560,7 +626,6 @@ int main() {
     int idAdvisors(1);
     int idAccounts(1);
     string rqt_create;
-
 
     // Création de la table des clients
     rqt_create = "CREATE TABLE IF NOT EXISTS Client ("  \
@@ -596,45 +661,7 @@ int main() {
     int answer(0);
     bool start = true;
 
-    //Création de nos premiers clients
-    unique_ptr<Personne> p1 = make_unique<Personne>("Jean", "Todt", "ici", idClients, 0);
-    clientsList.push_back(move(p1));
-    idClients+=1;
-    unique_ptr<Personne> p2 = make_unique<Personne>("Jean", "Todd", "la bas", idClients, 0);
-    clientsList.push_back(move(p2));
-    idClients+=1;
-    unique_ptr<Personne> p3 = make_unique<Personne>("Marc", "Todt", "chez lui", idClients, 0);
-    clientsList.push_back(move(p3));
-    idClients+=1;
-
-    //Création de nos premiers conseillers
-    unique_ptr<Personne> p4 = make_unique<Personne>("Yoann", "Le Saint", "Nantes DC", 0, idAdvisors);
-    idAdvisors+=1;
-    unique_ptr<Personne> p5 = make_unique<Personne>("Charlotte", "Todt", "NY", 0, idAdvisors);
-    idAdvisors+=1;
-    advisorsList.push_back(move(p4));
-    advisorsList.push_back(move(p5));
-
-    //Création de nos premiers comptes
-    unique_ptr<Compte> account1 = make_unique<CompteEnLigne>(clientsList.at(0).get(), advisorsList.at(1).get(), 500.f, idAccounts);
-    idAccounts+=1;
-    unique_ptr<Compte> account2 = make_unique<CompteEpargne>(clientsList.at(0).get(), advisorsList.at(1).get(), 3450.f, 3, idAccounts);
-    idAccounts+=1;
-    unique_ptr<Compte> account3 = make_unique<CompteStandard>(clientsList.at(1).get(), advisorsList.at(0).get(), 500.f, idAccounts);
-    idAccounts+=1;
-    unique_ptr<Compte> account4 = make_unique<CompteStandard>(clientsList.at(2).get(), advisorsList.at(0).get(), 10.f, idAccounts);
-    idAccounts+=1;
-    unique_ptr<Compte> account5 = make_unique<CompteStandard>(clientsList.at(2).get(), advisorsList.at(0).get(), 10000.f, idAccounts);
-    idAccounts+=1;
-
-    accountsList.push_back(move(account1));
-    accountsList.push_back(move(account2));
-    accountsList.push_back(move(account3));
-    accountsList.push_back(move(account4));
-    accountsList.push_back(move(account5));
-
-    //idAccounts = tableAccounts->lastId() + 1;
-    //cout << idAccounts << endl;
+    initBDD(&clientsList, &advisorsList, &accountsList, tableClients, tableAdvisors, tableAccounts, &idClients, &idAdvisors, &idAccounts);
 
     while(true) {
 
@@ -694,9 +721,9 @@ int main() {
         case 5:
             holdup(&accountsList);
             break;
-        case 6:
-            initBDD(&clientsList, &advisorsList, &accountsList, tableClients, tableAdvisors, tableAccounts, &idClients, &idAdvisors, &idAccounts);
-            break;
+        //case 6:
+        //    initBDD(&clientsList, &advisorsList, &accountsList, tableClients, tableAdvisors, tableAccounts, &idClients, &idAdvisors, &idAccounts);
+        //    break;
         default:
             cout << "Not a defined option. Please try again." << endl;
             break;
