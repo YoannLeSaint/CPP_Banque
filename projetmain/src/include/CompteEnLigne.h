@@ -1,8 +1,8 @@
 #pragma once
 #include <sstream>
 #include <string>
+#include <Personne.h>
 #include "Compte.h"
-#include "Personne.h"
 
 using namespace std;
 
@@ -12,10 +12,12 @@ private:
 
 public:
     CompteEnLigne() = default;
-    CompteEnLigne(Personne* holder, Personne* advisor, float amount);
+    CompteEnLigne(Personne* holder, Personne* advisor, float amount, int id);
     ~CompteEnLigne() = default;
 
 
     void inlineConsult();
     string toString();
+    string getValues();
+    string columns();
 };

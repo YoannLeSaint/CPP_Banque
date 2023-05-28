@@ -1,7 +1,7 @@
 #pragma once
 #include <sstream>
+#include <Personne.h>
 #include "Compte.h"
-#include "Personne.h"
 
 class CompteStandard : public Compte
 {
@@ -13,8 +13,10 @@ protected:
 
 public:
     CompteStandard() = default;
-    CompteStandard(Personne* holder, Personne* advisor, float amount);
+    CompteStandard(Personne* holder, Personne* advisor, float amount, int id);
     ~CompteStandard() = default;
 
     string toString();
+    string getValues();
+    string columns();
 };

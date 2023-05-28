@@ -50,3 +50,17 @@ On peut creer :
 
 Compte n'est pas instanciable.
 Gérer les agrégations et les compositions.
+
+
+## Thread
+
+Ajouter des opérations réccurentes :
+- Date
+- Nom
+- Sommes 
+- Réccurence (seconde)
+- Actif (boolean)
+- Count (permet de calculer le nombre d'occurence qu'il y a eu)
+
+On a la possibilité de supprimer la réccurence en changeant l'actif.
+Et on peut voir les stats avec programme.
